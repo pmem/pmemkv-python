@@ -6,8 +6,8 @@ class KVEngine():
 
     def __init__(self, engine_name, config):
         retVal = pmemkv_NI.start(engine_name, config)
-        if(error):
-            raise ValueError(error)
+        if(retVal):
+            raise ValueError(retVal)
 
     def stop(self):
         if not self.stopped:
