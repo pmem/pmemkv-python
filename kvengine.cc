@@ -32,7 +32,7 @@
 
 #include <Python.h>
 #include <string>
-#include "kvengine.h"
+#include <libpmemkv.h>
 using namespace pmemkv;
 
 KVEngine* kv;
