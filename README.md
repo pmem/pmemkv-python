@@ -49,7 +49,7 @@ assert kv.get(r"key1") == r"value1"
 print ("Iterating existing keys")
 kv.put(r"key2", r"value2")
 kv.put(r"key3", r"value3")
-kv.all(lambda k: print ("  visited: {}".format(k)))
+kv.all_strings(lambda k: print ("  visited: {}".format(k.decode())))
 
 print ("Removing existing key")
 kv.remove(r"key1")
