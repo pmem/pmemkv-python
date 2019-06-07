@@ -20,7 +20,8 @@ Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLI
 cd ~
 git clone https://github.com/pmem/pmemkv-python
 cd pmemkv-python
-sudo python3.6 setup.py install
+sudo locate libpmemkv.so
+sudo PMEMKV_SHARED_LIB=<path to libpmemkv.so> python3.6 setup.py install
 ```
 
 ## Testing
