@@ -52,7 +52,7 @@ class KVEngine():
     # Puts the key/value pair into pmemkv datastore.
     # Takes key & value from the end user.
     def put(self, key, value):
-        pmemkv_NI.put(key, value)
+        if pmemkv_NI.put(key, value) < 0:
             raise RuntimeError("Unable to put key: " + key)
 
     # Gets the value for the given key from pmemkv datastore.
