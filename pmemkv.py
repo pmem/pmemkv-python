@@ -32,10 +32,13 @@
 
 import pmemkv_NI
 
-class KVEngine():
+class Database():
 
     stopped = False
-    
+
+    def pmemkv_config_new(self):
+        return pmemkv_NI.pmemkv_config_new()
+
     # Starts the given engine.
     # Takes engine name and configuration from the end user.
     def __init__(self, engine, config):
@@ -55,6 +58,13 @@ class KVEngine():
         if pmemkv_NI.put(key, value) < 0:
             raise RuntimeError("Unable to put key: " + key)
 
+    # Takes key from the end user and returns the key removal status.
+    def remove(self, key):
+        returned = pmemkv_NI.remove(key)
+        if returned < 0:
+            raise RuntimeError("Unable to remove " + key)
+        return bool(returned)
+
     # Gets the value for the given key from pmemkv datastore.
     # Takes key from the end user and returns the value.
     def get(self, key):
@@ -66,51 +76,15 @@ class KVEngine():
         result = pmemkv_NI.get(key)
         return None if (result == None) else result.encode(encoding)
 
-    # Fetches all the keys from pmemkv datastore.
-    # Takes callback from the end user and sends the resulted keys through callback.
-    def all(self, func):
-        pmemkv_NI.all(func)
+    # Verifies the key presence in pmemkv datastore.
+    # Takes key from the end user and returns the key presence.
+    def exists(self, key):
+        return bool(pmemkv_NI.exists(key))
 
-    # Fetches all the keys from the begining of the pmemkv datastore till key matched.
-    # Takes key and callback from the end user and sends the resulted keys through callback.
-    def all_above(self, key, func):
-        pmemkv_NI.all_above(key, func)
-
-    # Fetches all the keys from the key matched in pmemkv datastore till end.
-    # Takes key and callback from the end user and sends the resulted keys through callback.
-    def all_below(self, key, func):
-        pmemkv_NI.all_below(key, func)
-
-    # Fetches all the keys present, between key1 and key2 from pmemkv datastore.
-    # Takes key1, key2 and callback from the end user and sends the resulted keys through callback.
-    def all_between(self, key1, key2, func):
-        pmemkv_NI.all_between(key1, key2, func)
-
-    # Fetches all the keys from pmemkv datastore and encodes them.
-    # Takes callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def all_strings(self, func, encoding = 'utf-8'):
-        pmemkv_NI.all(lambda k: func(k.encode(encoding)))
-
-    # Fetches all the keys from the begining of the pmemkv datastore till key matched and encodes them.
-    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def all_strings_above(self, key, func, encoding = 'utf-8'):
-        pmemkv_NI.all_above(key, lambda k: func(k.encode(encoding)))
-
-    # Fetches all the keys from the key matched in the pmemkv datastore till end and encodes them.
-    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def all_strings_below(self, key, func, encoding = 'utf-8'):
-        pmemkv_NI.all_below(key, lambda k: func(k.encode(encoding)))
-
-    # Fetches all the keys present, between key1 and key2 from pmemkv datastore and encodes them.
-    # Takes key1, key2, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def all_strings_between(self, key1, key2, func, encoding = 'utf-8'):
-        pmemkv_NI.all_between(key1, key2, lambda k: func(k.encode(encoding)))
-        
     # Counts the total number of keys in the pmemkv datastore.
     # Returns total number of keys.
     def count(self):
         return pmemkv_NI.count()
-
     # Counts the total number of keys from the begining of the pmemkv datastore till key matched.
     # Takes key from the end user, returns number of resulted keys.
     def count_above(self, key):
@@ -166,15 +140,42 @@ class KVEngine():
     def each_string_between(self, key1, key2, func, encoding = 'utf-8'):
         pmemkv_NI.each_between(key1, key2, lambda k, v: func(k.encode(encoding), v.encode(encoding)))
 
-    # Verifies the key presence in pmemkv datastore.
-    # Takes key from the end user and returns the key presence.
-    def exists(self, key):
-        return bool(pmemkv_NI.exists(key))
+    # Fetches all the keys from pmemkv datastore.
+    # Takes callback from the end user and sends the resulted keys through callback.
+    def all(self, func):
+        pmemkv_NI.all(func)
+    
+    # Fetches all the keys from the begining of the pmemkv datastore till key matched.
+    # Takes key and callback from the end user and sends the resulted keys through callback.
+    def all_above(self, key, func):
+        pmemkv_NI.all_above(key, func)
 
-    # Removes key from the pmemkv datastore.
-    # Takes key from the end user and returns the key removal status.
-    def remove(self, key):
-        returned = pmemkv_NI.remove(key)
-        if returned < 0:
-            raise RuntimeError("Unable to remove " + key)
-        return bool(returned)
+    # Fetches all the keys from the key matched in pmemkv datastore till end.
+    # Takes key and callback from the end user and sends the resulted keys through callback.
+    def all_below(self, key, func):
+        pmemkv_NI.all_below(key, func)
+
+    # Fetches all the keys present, between key1 and key2 from pmemkv datastore.
+    # Takes key1, key2 and callback from the end user and sends the resulted keys through callback.
+    def all_between(self, key1, key2, func):
+        pmemkv_NI.all_between(key1, key2, func)
+
+    # Fetches all the keys from pmemkv datastore and encodes them.
+    # Takes callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
+    def all_strings(self, func, encoding = 'utf-8'):
+        pmemkv_NI.all(lambda k: func(k.encode(encoding)))
+
+    # Fetches all the keys from the begining of the pmemkv datastore till key matched and encodes them.
+    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
+    def all_strings_above(self, key, func, encoding = 'utf-8'):
+        pmemkv_NI.all_above(key, lambda k: func(k.encode(encoding)))
+
+    # Fetches all the keys from the key matched in the pmemkv datastore till end and encodes them.
+    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
+    def all_strings_below(self, key, func, encoding = 'utf-8'):
+        pmemkv_NI.all_below(key, lambda k: func(k.encode(encoding)))
+
+    # Fetches all the keys present, between key1 and key2 from pmemkv datastore and encodes them.
+    # Takes key1, key2, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
+    def all_strings_between(self, key1, key2, func, encoding = 'utf-8'):
+        pmemkv_NI.all_between(key1, key2, lambda k: func(k.encode(encoding)))

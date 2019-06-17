@@ -20,8 +20,15 @@ Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLI
 cd ~
 git clone https://github.com/pmem/pmemkv-python
 cd pmemkv-python
-sudo locate libpmemkv.so
-sudo PMEMKV_SHARED_LIB=<path to libpmemkv.so> python3.6 setup.py install
+```
+If pmemkv is installed in defualt directory (e.g. /usr):
+```sh
+sudo python3.6 setup.py install
+```
+If pmemkv is in some other directory:
+```sh
+sudo python3 setup.py build_ext --library-dirs=path_to_pmemkv_lib_dir --include-dirs=path_to_pmemkv_include_dir
+sudo python3 setup.py install
 ```
 
 ## Testing
@@ -35,27 +42,27 @@ We are using `/dev/shm` to
 in this simple example.
 
 ```python
-from pmemkv import KVEngine
+from pmemkv import Database
 
 print ("Starting engine")
-kv = KVEngine(r"vsmap", '{"path":"/dev/shm/"}')
+db = Database(r"vsmap", '{"path":"/dev/shm/"}')
 
 print ("Put new key")
-kv.put(r"key1", r"value1")
-assert kv.count() == 1
+db.put(r"key1", r"value1")
+assert db.count() == 1
 
 print ("Reading key back")
-assert kv.get(r"key1") == r"value1"
+assert db.get(r"key1") == r"value1"
 
 print ("Iterating existing keys")
-kv.put(r"key2", r"value2")
-kv.put(r"key3", r"value3")
-kv.all_strings(lambda k: print ("  visited: {}".format(k.decode())))
+db.put(r"key2", r"value2")
+db.put(r"key3", r"value3")
+db.all_strings(lambda k: print ("  visited: {}".format(k.decode())))
 
 print ("Removing existing key")
-kv.remove(r"key1")
-assert not kv.exists(r"key1")
+db.remove(r"key1")
+assert not db.exists(r"key1")
 
 print ("Stopping engine")
-kv.stop()
+db.stop()
 ```

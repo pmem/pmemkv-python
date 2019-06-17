@@ -33,7 +33,8 @@
 from distutils.core import setup, Extension
 import os
 
-link_modules = Extension("pmemkv_NI", ["kvengine.cc"], extra_objects = [os.environ['PMEMKV_SHARED_LIB']])
+link_modules = Extension("pmemkv_NI", ["kvengine.cc"], libraries = ["pmemkv"])
+
 setup(name = "Python_Pmemkv",
       version = "1.0",
       description = "Python bindings for PMEMKV Engine",
