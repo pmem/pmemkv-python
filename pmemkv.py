@@ -36,9 +36,6 @@ class Database():
 
     stopped = False
 
-    def pmemkv_config_new(self):
-        return pmemkv_NI.pmemkv_config_new()
-
     # Starts the given engine.
     # Takes engine name and configuration from the end user.
     def __init__(self, engine, config):
