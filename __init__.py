@@ -29,13 +29,5 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
-from distutils.core import setup, Extension
 
-link_modules = Extension('pmemkv_NI', ['kvengine.cc'], libraries = ['pmemkv'])
-
-setup(name= 'Python_Pmemkv',
-    version = '1.0',
-    description = 'Python bindings for PMEMKV Engine',
-    packages = ['pmemkv'],
-    package_dir = {'pmemkv': '.'},
-    ext_modules = [link_modules])
+from pmemkv.pmemkv import Database
