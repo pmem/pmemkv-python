@@ -184,7 +184,7 @@ class TestKVEngine(unittest.TestCase):
         db = Database(self.engine, self.config)
         val = r"记 means to remember, note, record"
         db.put(r"key1", val)
-        self.assertEqual(db.get(r"key1"), val)
+        self.assertEqual(db.get_string(r"key1").decode(), val)
         db.stop()
 
     def test_removes_key_and_value(self):
