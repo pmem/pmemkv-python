@@ -33,7 +33,11 @@ sudo python3 setup.py install
 
 ## Testing
 
-TBD
+Python bindings includes automated unittest cases.
+Use following command to run test cases:
+```python
+python3.6 -m unittest -v pmemkv_tests.py
+```
 
 ## Example
 
