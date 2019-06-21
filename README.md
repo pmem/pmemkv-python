@@ -27,8 +27,8 @@ sudo python3.6 setup.py install
 ```
 If pmemkv is in some other directory:
 ```sh
-sudo python3 setup.py build_ext --library-dirs=path_to_pmemkv_lib_dir --include-dirs=path_to_pmemkv_include_dir
-sudo python3 setup.py install
+sudo python3.6 setup.py build_ext --library-dirs=path_to_pmemkv_lib_dir --include-dirs=path_to_pmemkv_include_dir
+sudo python3.6 setup.py install
 ```
 
 ## Testing
