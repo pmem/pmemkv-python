@@ -36,7 +36,7 @@ from pmemkv import Database
 class TestKVEngine(unittest.TestCase):
 
     engine = r"vsmap"
-    config = "{\"path\":\"/dev/shm\"}"
+    config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
 
     key = r""
     key_and_value = r""
@@ -60,11 +60,11 @@ class TestKVEngine(unittest.TestCase):
 
     def test_blackhole_engine(self):
         db = Database(r"blackhole", self.config)
-        self.assertEqual(db.count(), 0)
+        self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
         self.assertEqual(db.get(r"key1"), None)
         db.put(r"key1", r"value123")
-        self.assertEqual(db.count(), 0)
+        self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
         self.assertEqual(db.get(r"key1"), None)
         self.assertTrue(db.remove(r"key1"))
@@ -141,11 +141,8 @@ class TestKVEngine(unittest.TestCase):
         db.put(r"empty", r"")
         db.put(r"single-space", r" ")
         db.put(r"two-tab", r"\t\t")
-        self.assertTrue(db.exists(r"empty"))
         self.assertEqual(db.get(r"empty"), r"")
-        self.assertTrue(db.exists(r"single-space"))
         self.assertEqual(db.get(r"single-space"), r" ")
-        self.assertTrue(db.exists(r"two-tab"))
         self.assertEqual(db.get(r"two-tab"), r"\t\t")
         db.stop()
 
@@ -204,7 +201,7 @@ class TestKVEngine(unittest.TestCase):
             db = Database(self.engine, "{}")
             self.assertFalse(True)
         except ValueError as ve:
-            self.assertEqual(ve.args[0], "Config does not include valid path string")
+            self.assertEqual(ve.args[0], "pmemkv_open failed")
         self.assertEqual(db, None)
 
     def test_exception_on_start_when_config_is_malformed(self):
@@ -213,7 +210,7 @@ class TestKVEngine(unittest.TestCase):
             db = Database(self.engine, "{")
             self.assertFalse(True)
         except ValueError as ve:
-            self.assertEqual(ve.args[0], "Config could not be parsed as JSON")
+            self.assertEqual(ve.args[0], "Creating a pmemkv config from JSON string failed")
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_engine_is_invalid(self):
@@ -222,7 +219,7 @@ class TestKVEngine(unittest.TestCase):
             db = Database(r"nope.nope", self.config)
             self.assertFalse(True)
         except ValueError as ve:
-            self.assertEqual(ve.args[0], "Unknown engine name")
+            self.assertEqual(ve.args[0], "pmemkv_open failed")
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_path_is_invalid(self):
@@ -231,7 +228,7 @@ class TestKVEngine(unittest.TestCase):
             db = Database(self.engine, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\"}")
             self.assertFalse(True)
         except ValueError as ve:
-            self.assertEqual(ve.args[0], "Config path is not an existing directory")
+            self.assertEqual(ve.args[0], "pmemkv_open failed")
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_path_is_wrong_type(self):
@@ -240,10 +237,10 @@ class TestKVEngine(unittest.TestCase):
             db = Database(self.engine, '{"path":1234}')
             self.assertFalse(True)
         except ValueError as ve:
-            self.assertEqual(ve.args[0], "Config does not include valid path string")
+            self.assertEqual(ve.args[0], "pmemkv_open failed")
         self.assertEqual(db, None)
 
-    def test_uses_all(self):
+    def test_uses_get_keys(self):
         db = Database(self.engine, self.config)
         db.put(r"1", r"one")
         db.put(r"2", r"two")
@@ -251,17 +248,17 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"<{}>,"
 
         self.key = r""
-        db.all(self.all_and_each)
+        db.get_keys(self.all_and_each)
         self.assertEqual(self.key, r"<1>,<2>,")
 
         db.put(r"记!", r"RR")
         self.key = r""
-        db.all_strings(self.all_and_each_strings)
+        db.get_keys_strings(self.all_and_each_strings)
         self.assertEqual(self.key, r"<1>,<2>,<记!>,")
 
         db.stop()
 
-    def test_all_above(self):
+    def test_uses_get_keys_above(self):
         db = Database(self.engine, self.config)
         db.put(r"A", r"1")
         db.put(r"AB", r"2")
@@ -273,17 +270,17 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"{},"
 
         self.key = r""
-        db.all_above(r"B", self.all_and_each)
+        db.get_keys_above(r"B", self.all_and_each)
         self.assertEqual(self.key, r"BB,BC,")
 
         db.put(r"记!", r"RR")
         self.key = r""
-        db.all_strings_above(r"", self.all_and_each_strings)
+        db.get_keys_strings_above(r"", self.all_and_each_strings)
 
         self.assertEqual(self.key, r"A,AB,AC,B,BB,BC,记!,")
         db.stop()
 
-    def test_all_below(self):
+    def test_uses_get_keys_below(self):
         db = Database(self.engine, self.config)
         db.put(r"A", r"1")
         db.put(r"AB", r"2")
@@ -295,16 +292,16 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"{},"
 
         self.key = r""
-        db.all_below(r"B", self.all_and_each)
+        db.get_keys_below(r"B", self.all_and_each)
         self.assertEqual(self.key, r"A,AB,AC,")
 
         db.put(r"记!", r"RR")
         self.key = r""
-        db.all_strings_below("\uFFFF", self.all_and_each_strings)
+        db.get_keys_strings_below("\uFFFF", self.all_and_each_strings)
         self.assertEqual(self.key, r"A,AB,AC,B,BB,BC,记!,")
         db.stop()
 
-    def test_all_between(self):
+    def test_uses_get_keys_between(self):
         db = Database(self.engine, self.config)
         db.put(r"A", r"1")
         db.put(r"AB", r"2")
@@ -316,23 +313,23 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"{},"
 
         self.key = r""
-        db.all_between(r"A", r"B", self.all_and_each)
+        db.get_keys_between(r"A", r"B", self.all_and_each)
         self.assertEqual(self.key, r"AB,AC,")
 
         db.put(r"记!", r"RR")
         self.key = r""
-        db.all_strings_between(r"B", "\uFFFF", self.all_and_each_strings)
+        db.get_keys_strings_between(r"B", "\uFFFF", self.all_and_each_strings)
         self.assertEqual(self.key, r"BB,BC,记!,")
 
         self.key = r""
-        db.all_between(r"", r"", self.all_and_each)
-        db.all_between(r"A", r"A", self.all_and_each)
-        db.all_between(r"B", r"A", self.all_and_each)
+        db.get_keys_between(r"", r"", self.all_and_each)
+        db.get_keys_between(r"A", r"A", self.all_and_each)
+        db.get_keys_between(r"B", r"A", self.all_and_each)
         self.assertEqual(self.key, r"")
 
         db.stop()
 
-    def test_count(self):
+    def test_uses_count_all(self):
         db = Database(self.engine, self.config)
         db.put(r"A", r"1")
         db.put(r"AB", r"2")
@@ -341,7 +338,7 @@ class TestKVEngine(unittest.TestCase):
         db.put(r"BB", r"5")
         db.put(r"BC", r"6")
         db.put(r"BD", r"7")
-        self.assertEqual(db.count(), 7)
+        self.assertEqual(db.count_all(), 7)
 
         self.assertEqual(db.count_above(r""), 7)
         self.assertEqual(db.count_above(r"A"), 6)
@@ -371,7 +368,7 @@ class TestKVEngine(unittest.TestCase):
 
         db.stop()
 
-    def test_each(self):
+    def test_uses_get_all(self):
         db = Database(self.engine, self.config)
         db.put(r"1", r"one")
         db.put(r"2", r"two")
@@ -379,17 +376,17 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"<{}>,<{}>|"
 
         self.key_and_value = r""
-        db.each(self.all_and_each)
+        db.get_all(self.all_and_each)
         self.assertEqual(self.key_and_value, r"<1>,<one>|<2>,<two>|")
 
         db.put(r"记!", r"RR")
         self.key_and_value = r""
-        db.each_string(self.all_and_each_strings)
+        db.get_all_string(self.all_and_each_strings)
         self.assertEqual(self.key_and_value, r"<1>,<one>|<2>,<two>|<记!>,<RR>|")
 
         db.stop()
 
-    def test_each_above(self):
+    def test_uses_get_above(self):
         db = Database(self.engine, self.config)
         db.put(r"A", "1")
         db.put(r"AB", r"2")
@@ -401,17 +398,17 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"{},{}|"
     
         self.key_and_value = r""
-        db.each_above(r"B", self.all_and_each)
+        db.get_above(r"B", self.all_and_each)
         self.assertEqual(self.key_and_value, r"BB,5|BC,6|")
 
         db.put(r"记!", r"RR")
         self.key_and_value = r""
-        db.each_string_above(r"", self.all_and_each_strings)
+        db.get_string_above(r"", self.all_and_each_strings)
         self.assertEqual(self.key_and_value, r"A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|")
 
         db.stop()
 
-    def test_each_below(self):
+    def test_uses_get_below(self):
         db = Database(self.engine, self.config)
         db.put(r"A", r"1")
         db.put(r"AB", r"2")
@@ -423,12 +420,12 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"{},{}|"
 
         self.key_and_value = r""
-        db.each_below(r"AC", self.all_and_each)
+        db.get_below(r"AC", self.all_and_each)
         self.assertEqual(self.key_and_value, r"A,1|AB,2|")
 
         db.put(r"记!", r"RR")
         self.key_and_value = r""
-        db.each_string_below("\uFFFD", self.all_and_each_strings)
+        db.get_string_below("\uFFFD", self.all_and_each_strings)
         self.assertEqual(self.key_and_value, r"A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|")
 
         db.stop()
@@ -445,18 +442,18 @@ class TestKVEngine(unittest.TestCase):
         self.formatter = r"{},{}|"
 
         self.key_and_value = r""
-        db.each_between(r"A", r"B", self.all_and_each)
+        db.get_between(r"A", r"B", self.all_and_each)
         self.assertEqual(self.key_and_value, r"AB,2|AC,3|")
 
         db.put(r"记!", r"RR")
         self.key_and_value = r""
-        db.each_string_between(r"B", "\uFFFD", self.all_and_each_strings)
+        db.get_string_between(r"B", "\uFFFD", self.all_and_each_strings)
         self.assertEqual(self.key_and_value, r"BB,5|BC,6|记!,RR|")
 
         self.key_and_value = r""
-        db.each_between(r"", r"", self.all_and_each)
-        db.each_between(r"A", r"A", self.all_and_each)
-        db.each_between(r"B", r"A", self.all_and_each)
+        db.get_between(r"", r"", self.all_and_each)
+        db.get_between(r"A", r"A", self.all_and_each)
+        db.get_between(r"B", r"A", self.all_and_each)
         self.assertEqual(self.key_and_value, r"")
 
         db.stop()
