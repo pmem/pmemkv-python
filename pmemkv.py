@@ -41,19 +41,23 @@ PMEMKV_STATUS_CONFIG_PARSING_ERROR = 5
 
 class Database():
 
-    stopped = False
+    # Getter for __stopped
+    @property
+    def stopped(self):
+        return self.__stopped
 
     # Starts the given engine.
     # Takes engine name and configuration from the end user.
     def __init__(self, engine, config):
+        self.__stopped = False
         result = pmemkv_NI.start(engine, config)
         if result != None:
             raise ValueError(result)
 
     # Stops the running engine.
     def stop(self):
-        if not self.stopped:
-            self.stopped = True
+        if not self.__stopped:
+            self.__stopped = True
             pmemkv_NI.stop()
 
     # Puts the key/value pair into pmemkv datastore.
