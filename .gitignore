@@ -1,0 +1,6 @@
+.*
+!.gitignore
+!.gitattributes
+!.travis.yml
+/build/
+__pycache__/
