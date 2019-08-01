@@ -41,8 +41,8 @@ PyObject* Python_Callback;
 // Turn on/off operations.
 static PyObject *
 pmemkv_NI_Start(PyObject* self, PyObject* args) {
-	Py_buffer engine, path;
-	if (!PyArg_ParseTuple(args, "s*s*", &engine, &path)) {
+	Py_buffer engine, json_config;
+	if (!PyArg_ParseTuple(args, "s*s*", &engine, &json_config)) {
 		return NULL;
 	}
 
@@ -51,7 +51,7 @@ pmemkv_NI_Start(PyObject* self, PyObject* args) {
 		return Py_BuildValue("s", "Allocating a new pmemkv config failed");
 	}
 
-	int rv = pmemkv_config_from_json(config, (const char*) path.buf);
+	int rv = pmemkv_config_from_json(config, (const char*) json_config.buf);
 	if (rv != PMEMKV_STATUS_OK) {
 		pmemkv_config_delete(config);
 		return Py_BuildValue("s", "Creating a pmemkv config from JSON string failed");
