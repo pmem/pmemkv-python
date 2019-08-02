@@ -11,7 +11,7 @@ We take outside code contributions to `pmemkv-python` through GitHub pull reques
 
 **NOTE: If you do decide to implement code changes and contribute them,
 please make sure you agree your contribution can be made available
-under the [BSD-style License used for the PMDK](https://github.com/pmem/pmdk/blob/master/LICENSE).**
+under the [BSD-style License used for the PMEMKV-PYTHON](https://github.com/pmem/pmemkv-python/blob/master/LICENSE).**
 
 **NOTE: Submitting your changes also means that you certify the following:**
 
