@@ -33,6 +33,7 @@
 #include <Python.h>
 #include <string>
 #include <libpmemkv.h>
+#include <libpmemkv_json_config.h>
 #include <iostream>
 
 pmemkv_db* db;

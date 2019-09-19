@@ -31,11 +31,11 @@
 '''
 from distutils.core import setup, Extension
 
-link_modules = Extension('pmemkv_NI', ['kvengine.cc'], libraries = ['pmemkv'])
+link_modules = Extension('pmemkv_NI', ['kvengine.cc'], libraries = ['pmemkv', 'pmemkv_json_config'])
 
 setup(name= 'Python_Pmemkv',
     version = '1.0',
     description = 'Python bindings for PMEMKV Engine',
-    packages = ['pmemkv'],
-    package_dir = {'pmemkv': '.'},
+    packages = ['pmemkv', 'pmemkv_json_config'],
+    package_dir = {'pmemkv': '.', 'pmemkv_json_config': '.'},
     ext_modules = [link_modules])
