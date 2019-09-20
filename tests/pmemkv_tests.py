@@ -31,7 +31,8 @@
 '''
 
 import unittest
-from pmemkv import Database
+
+from pmemkv.pmemkv import Database,PMEMKV_STATUS_NOT_FOUND
 
 class TestKVEngine(unittest.TestCase):
 
@@ -62,14 +63,14 @@ class TestKVEngine(unittest.TestCase):
         db = Database(r"blackhole", self.config)
         self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get(r"key1"), PMEMKV_STATUS_NOT_FOUND)
         db.put(r"key1", r"value123")
         self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get(r"key1"), PMEMKV_STATUS_NOT_FOUND)
         self.assertTrue(db.remove(r"key1"))
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get(r"key1"), PMEMKV_STATUS_NOT_FOUND)
         db.stop()
 
     def test_start_engine(self):
@@ -92,7 +93,7 @@ class TestKVEngine(unittest.TestCase):
     def test_gets_missing_key(self):
         db = Database(self.engine, self.config)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get(r"key1"), PMEMKV_STATUS_NOT_FOUND)
         db.stop()
 
     def test_puts_basic_values(self):
@@ -192,7 +193,7 @@ class TestKVEngine(unittest.TestCase):
         self.assertTrue(db.remove(r"key1"))
         self.assertFalse(db.remove(r"key1"))
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get(r"key1"), PMEMKV_STATUS_NOT_FOUND)
         db.stop()
 
     def test_throws_exception_on_start_when_config_is_empty(self):
