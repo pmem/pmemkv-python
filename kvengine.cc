@@ -284,8 +284,10 @@ pmemkv_NI_Get(PyObject* self, PyObject* args) {
 		c->value.append(v, vb);
 	};
 	int result = pmemkv_get(db, (const char*) key.buf, key.len, callback, &cxt);
-	if (result != PMEMKV_STATUS_OK) {
-		return PyLong_FromLong(result);
+	if (result != PMEMKV_STATUS_OK && result != PMEMKV_STATUS_NOT_FOUND) {
+		// create an exception with value 'result'
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
 	} else if (cxt.status == PMEMKV_STATUS_OK) {
 		return Py_BuildValue("s#", cxt.value.data(), cxt.value.size());
 	}

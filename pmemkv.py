@@ -114,7 +114,7 @@ class Database():
         result = pmemkv_NI.get_keys_above(key, lambda k: func(k.encode(encoding)))
         if result != PMEMKV_STATUS_OK:
             raise RuntimeError("pmemkv_get_above() failed")
-        return result     
+        return result
 
     # Fetches all the keys from the key matched in the pmemkv datastore till end and encodes them.
     # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
@@ -241,20 +241,19 @@ class Database():
     # Gets the value for the given key from pmemkv datastore.
     # Takes key from the end user and returns the value.
     def get(self, key):
-        value = pmemkv_NI.get(key)
-        # XXX fix the case: value == int(PMEMKV_STATUS_UNKNOWN_ERROR)
-        if value == PMEMKV_STATUS_UNKNOWN_ERROR:
+        try:
+            return pmemkv_NI.get(key)
+        except:
             raise RuntimeError("pmemkv_get() failed")
-        return value
 
     # Gets the value for the given key from pmemkv datastore.
     # Takes key and encoding algorithm from the end user and returns the encoded value.
     def get_string(self, key, encoding = 'utf-8'):
-        value = pmemkv_NI.get(key)
-        # XXX fix the case: value == int(PMEMKV_STATUS_UNKNOWN_ERROR)
-        if value == PMEMKV_STATUS_UNKNOWN_ERROR:
+        try:
+            value = pmemkv_NI.get(key)
+            return None if (value == None) else value.encode(encoding)
+        except:
             raise RuntimeError("pmemkv_get() failed")
-        return None if (value == None) else value.encode(encoding)
 
     # Takes key from the end user and returns the key removal status.
     def remove(self, key):
