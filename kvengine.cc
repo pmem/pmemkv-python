@@ -49,19 +49,25 @@ pmemkv_NI_Start(PyObject* self, PyObject* args) {
 
 	pmemkv_config *config = pmemkv_config_new();
 	if (config == nullptr) {
-		return Py_BuildValue("s", "Allocating a new pmemkv config failed");
+		// "Allocating a new pmemkv config failed"
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(PMEMKV_STATUS_OUT_OF_MEMORY));
+		return NULL;
 	}
 
 	int rv = pmemkv_config_from_json(config, (const char*) json_config.buf);
 	if (rv != PMEMKV_STATUS_OK) {
 		pmemkv_config_delete(config);
-		return Py_BuildValue("s", "Creating a pmemkv config from JSON string failed");
+		// "Creating a pmemkv config from JSON string failed"
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(rv));
+		return NULL;
 	}
 
 	rv = pmemkv_open((const char*) engine.buf, config, &db);
 	if (rv != PMEMKV_STATUS_OK) {
-                return Py_BuildValue("s", "pmemkv_open failed");
-        }
+		// "pmemkv_open failed"
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(rv));
+		return NULL;
+	}
 	Py_RETURN_NONE;
 }
 
@@ -78,11 +84,15 @@ pmemkv_NI_GetKeys(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	auto callback = [](const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) -> int {
-                PyObject* args = Py_BuildValue("(s#)", key, keybytes);
-                PyObject_CallObject(Python_Callback, args);
-                return 0;
-        };
+		PyObject* args = Py_BuildValue("(s#)", key, keybytes);
+		PyObject_CallObject(Python_Callback, args);
+		return 0;
+	};
 	int result = pmemkv_get_all(db, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
 	return PyLong_FromLong(result);
 }
 
@@ -93,11 +103,15 @@ pmemkv_NI_GetKeysAbove(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	auto callback = [](const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) -> int {
-                PyObject* args = Py_BuildValue("(s#)", key, keybytes);
-                PyObject_CallObject(Python_Callback, args);
-                return 0;
-        };
+		PyObject* args = Py_BuildValue("(s#)", key, keybytes);
+		PyObject_CallObject(Python_Callback, args);
+		return 0;
+	};
 	int result = pmemkv_get_above(db, (const char*) key.buf, key.len, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
 	return PyLong_FromLong(result);
 }
 
@@ -108,12 +122,16 @@ pmemkv_NI_GetKeysBelow(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	auto callback = [](const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) -> int {
-                PyObject* args = Py_BuildValue("(s#)", key, keybytes);
-                PyObject_CallObject(Python_Callback, args);
-                return 0;
-        };
-        int result = pmemkv_get_below(db, (const char*) key.buf, key.len, callback, nullptr);
-        return PyLong_FromLong(result);
+		PyObject* args = Py_BuildValue("(s#)", key, keybytes);
+		PyObject_CallObject(Python_Callback, args);
+		return 0;
+	};
+	int result = pmemkv_get_below(db, (const char*) key.buf, key.len, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return PyLong_FromLong(result);
 }
 
 static PyObject *
@@ -123,12 +141,16 @@ pmemkv_NI_GetKeysBetween(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	auto callback = [](const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) -> int {
-                PyObject* args = Py_BuildValue("(s#)", key, keybytes);
-                PyObject_CallObject(Python_Callback, args);
-                return 0;
-        };
-        int result = pmemkv_get_between(db, (const char*) key1.buf, key1.len, (const char*) key2.buf, key2.len, callback, nullptr);
-        return PyLong_FromLong(result);
+		PyObject* args = Py_BuildValue("(s#)", key, keybytes);
+		PyObject_CallObject(Python_Callback, args);
+		return 0;
+	};
+	int result = pmemkv_get_between(db, (const char*) key1.buf, key1.len, (const char*) key2.buf, key2.len, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return PyLong_FromLong(result);
 }
 
 // "Count" Methods.
@@ -136,10 +158,11 @@ static PyObject *
 pmemkv_NI_CountAll(PyObject* self) {
 	size_t cnt;
 	int result = pmemkv_count_all(db, &cnt);
-	if (result == PMEMKV_STATUS_OK) {
-		return Py_BuildValue("i", cnt);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
 	}
-	Py_RETURN_NONE;
+	return Py_BuildValue("i", cnt);
 }
 
 static PyObject *
@@ -150,10 +173,11 @@ pmemkv_NI_CountAbove(PyObject* self, PyObject* args) {
 	}
 	size_t cnt;
 	int result = pmemkv_count_above(db, (const char*) key.buf, key.len, &cnt);
-        if (result == PMEMKV_STATUS_OK) { 
-                return Py_BuildValue("i", cnt);
-        }
-        Py_RETURN_NONE;
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return Py_BuildValue("i", cnt);
 }
 
 static PyObject *
@@ -164,10 +188,11 @@ pmemkv_NI_CountBelow(PyObject* self, PyObject* args) {
 	}
 	size_t cnt;
 	int result = pmemkv_count_below(db, (const char*) key.buf, key.len, &cnt);
-        if (result == PMEMKV_STATUS_OK) { 
-                return Py_BuildValue("i", cnt);
-        }
-        Py_RETURN_NONE;
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return Py_BuildValue("i", cnt);
 }
 
 static PyObject *
@@ -178,10 +203,11 @@ pmemkv_NI_CountBetween(PyObject* self, PyObject* args) {
 	}
 	size_t cnt;
 	int result = pmemkv_count_between(db, (const char*) key1.buf, key1.len, (const char*) key2.buf, key2.len, &cnt);
-        if (result == PMEMKV_STATUS_OK) { 
-                return Py_BuildValue("i", cnt);
-        }
-        Py_RETURN_NONE;
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return Py_BuildValue("i", cnt);
 }
 
 // "Each" Methods.
@@ -191,12 +217,16 @@ pmemkv_NI_GetAll(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	auto callback = [](const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) -> int {
-                PyObject* args = Py_BuildValue("(s#s#)", key, keybytes, value, valuebyte);
-                PyObject_CallObject(Python_Callback, args);
+		PyObject* args = Py_BuildValue("(s#s#)", key, keybytes, value, valuebyte);
+		PyObject_CallObject(Python_Callback, args);
 		return 0;
-        };
-        int result = pmemkv_get_all(db, callback, nullptr);
-        return PyLong_FromLong(result);
+	};
+	int result = pmemkv_get_all(db, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return PyLong_FromLong(result);
 }
 
 static PyObject *
@@ -211,6 +241,10 @@ pmemkv_NI_GetAbove(PyObject* self, PyObject* args) {
 		return 0;
 	};
 	int result = pmemkv_get_above(db, (const char*) key.buf, key.len, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
 	return PyLong_FromLong(result);
 }
 
@@ -221,12 +255,16 @@ pmemkv_NI_GetBelow(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	auto callback = [](const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) -> int {
-                PyObject* args = Py_BuildValue("(s#s#)", key, keybytes, value, valuebyte);
-                PyObject_CallObject(Python_Callback, args);
-                return 0;
-        };
-        int result = pmemkv_get_below(db, (const char*) key.buf, key.len, callback, nullptr);
-        return PyLong_FromLong(result);
+		PyObject* args = Py_BuildValue("(s#s#)", key, keybytes, value, valuebyte);
+		PyObject_CallObject(Python_Callback, args);
+		return 0;
+	};
+	int result = pmemkv_get_below(db, (const char*) key.buf, key.len, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return PyLong_FromLong(result);
 }
 
 static PyObject *
@@ -236,12 +274,16 @@ pmemkv_NI_GetBetween(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	auto callback = [](const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) -> int {
-                PyObject* args = Py_BuildValue("(s#s#)", key, keybytes, value, valuebyte);
-                PyObject_CallObject(Python_Callback, args);
-                return 0;
-        };
-        int result = pmemkv_get_between(db, (const char*) key1.buf, key1.len, (const char*) key2.buf, key2.len, callback, nullptr);
-        return PyLong_FromLong(result);
+		PyObject* args = Py_BuildValue("(s#s#)", key, keybytes, value, valuebyte);
+		PyObject_CallObject(Python_Callback, args);
+		return 0;
+	};
+	int result = pmemkv_get_between(db, (const char*) key1.buf, key1.len, (const char*) key2.buf, key2.len, callback, nullptr);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return PyLong_FromLong(result);
 }
 
 // "Exists" Method.
@@ -252,7 +294,11 @@ pmemkv_NI_Exists(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	int result = pmemkv_exists(db, (const char*) key.buf, key.len);
-	return PyLong_FromLong(result);
+	if (result != PMEMKV_STATUS_OK && result != PMEMKV_STATUS_NOT_FOUND) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return PyLong_FromLong(result == PMEMKV_STATUS_OK);
 }
 
 // "CRUD" Operations.
@@ -263,6 +309,10 @@ pmemkv_NI_Put(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	int result = pmemkv_put(db, (const char*) key.buf, key.len, (const char*) value.buf, value.len);
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
 	return PyLong_FromLong(result);
 }
 
@@ -284,8 +334,9 @@ pmemkv_NI_Get(PyObject* self, PyObject* args) {
 		c->value.append(v, vb);
 	};
 	int result = pmemkv_get(db, (const char*) key.buf, key.len, callback, &cxt);
-	if (result != PMEMKV_STATUS_OK) {
-		return PyLong_FromLong(result);
+	if (result != PMEMKV_STATUS_OK && result != PMEMKV_STATUS_NOT_FOUND) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
 	} else if (cxt.status == PMEMKV_STATUS_OK) {
 		return Py_BuildValue("s#", cxt.value.data(), cxt.value.size());
 	}
@@ -299,7 +350,11 @@ pmemkv_NI_Remove(PyObject* self, PyObject* args) {
 		return NULL;
 	}
 	int result = pmemkv_remove(db, (const char*) key.buf, key.len);
-        return PyLong_FromLong(result);
+	if (result != PMEMKV_STATUS_OK && result != PMEMKV_STATUS_NOT_FOUND) {
+		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		return NULL;
+	}
+	return PyLong_FromLong(result == PMEMKV_STATUS_OK);
 }
 
 // Functions declarations.
