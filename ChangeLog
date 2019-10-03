@@ -1,0 +1,8 @@
+Fri Oct 04 2019 Szymon Romik <szymon.romik@intel.com>
+
+	* Version 0.9
+
+	This is the first official release of pmemkv-python project.
+
+        It provides Python bindings to libpmemkv 1.0 with simplified API and not
+        functionally equal to its native C/C++ counterpart.
