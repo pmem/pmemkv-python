@@ -38,10 +38,7 @@ set -e
 
 package_type=$1
 
-# stable_pmemkv_version="0.8"
-
-# commit: Merge pull request #436 from ldorau/Replace-PMEMKV_STATUS_FAILED-with-PMEMKV_STATUS_UNKNOWN_ERROR, 20.09.2019
-current_pmemkv_version="f14ea1c0243f5b968b835d3581a8a066edfc9373"
+stable_pmemkv_version="1.0"
 
 prepare_pmemkv () {
 	pmemkv_version="$1"
@@ -62,8 +59,7 @@ prepare_pmemkv () {
 git clone https://github.com/pmem/pmemkv
 cd pmemkv
 
-# prepare_pmemkv "$stable_pmemkv_version" "pmemkv-stable"
-prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
+prepare_pmemkv "$stable_pmemkv_version" "pmemkv-stable"
 
 cd ..
 rm -r pmemkv
