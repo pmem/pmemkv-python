@@ -34,7 +34,7 @@ from distutils.core import setup, Extension
 link_modules = Extension('pmemkv_NI', ['kvengine.cc'], libraries = ['pmemkv', 'pmemkv_json_config'])
 
 setup(name= 'Python_Pmemkv',
-    version = '1.0',
+    version = '0.9',
     description = 'Python bindings for PMEMKV Engine',
     packages = ['pmemkv', 'pmemkv_json_config'],
     package_dir = {'pmemkv': '.', 'pmemkv_json_config': '.'},
