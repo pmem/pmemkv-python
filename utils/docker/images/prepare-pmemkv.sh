@@ -50,7 +50,7 @@ prepare_pmemkv () {
 		-DCMAKE_INSTALL_PREFIX=$PREFIX \
 		-DCPACK_GENERATOR=$package_type \
 		-DBUILD_TESTS=OFF
-	make package
+	make -j$(nproc) package
 	cd ..
 	mkdir /opt/"$version_name"
 	mv  build/* /opt/"$version_name"
