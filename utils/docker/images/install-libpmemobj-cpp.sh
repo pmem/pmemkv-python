@@ -40,14 +40,14 @@ set -e
 git clone https://github.com/pmem/libpmemobj-cpp
 cd libpmemobj-cpp
 
-# Add transaction_out_of_memory exception; July 15th
+# tag: 1.8; 03.10.2019
 git checkout 1.8
 
 mkdir build
 cd build
 
 cmake .. -DCPACK_GENERATOR="$1" -DCMAKE_INSTALL_PREFIX=/usr
-make package
+make -j$(nproc) package
 if [ "$1" = "DEB" ]; then
       sudo dpkg -i libpmemobj++*.deb
 elif [ "$1" = "RPM" ]; then
