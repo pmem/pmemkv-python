@@ -35,12 +35,12 @@
 #
 
 # Pull base image
-FROM ubuntu:19.04
+FROM ubuntu:19.10
 MAINTAINER szymon.romik@intel.com
 
 # Set required environment variables
 ENV OS ubuntu
-ENV OS_VER 19.04
+ENV OS_VER 19.10
 ENV PACKAGE_MANAGER deb
 ENV NOTTY 1
 
