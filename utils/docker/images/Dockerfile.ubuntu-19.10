@@ -80,9 +80,6 @@ RUN ./install-pmdk.sh dpkg
 COPY install-libpmemobj-cpp.sh install-libpmemobj-cpp.sh
 RUN ./install-libpmemobj-cpp.sh DEB
 
-COPY install-memkind.sh install-memkind.sh
-RUN ./install-memkind.sh
-
 # Prepare pmemkv
 COPY prepare-pmemkv.sh prepare-pmemkv.sh
 RUN ./prepare-pmemkv.sh DEB
