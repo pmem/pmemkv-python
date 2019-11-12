@@ -58,6 +58,24 @@ class Database():
         self.__stopped = False
         result = pmemkv_NI.start(engine, config)
 
+    def __setitem__(self, key, value):
+        self.put(key,value)
+
+    def __getitem__(self, key):
+        item = self.get(key)
+        if not item:
+            raise KeyError(key)
+        return item
+
+    def __len__(self):
+        return self.count_all()
+
+    def __contains__(self, key):
+        return self.exists(key)
+
+    def __delitem__(self, key):
+        self.remove(key)
+
     # Stops the running engine.
     def stop(self):
         if not self.__stopped:

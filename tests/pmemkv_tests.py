@@ -467,5 +467,41 @@ class TestKVEngine(unittest.TestCase):
 
         db.stop()
 
+    def test_dict_set_item(self):
+        db = Database(self.engine, self.config)
+        db['string_value'] = "test"
+        self.assertEqual(db['string_value'], "test")
+        db.stop()
+
+    def test_dict_get_item(self):
+        db = Database(self.engine, self.config)
+        key = "dict_test"
+        db[key] = "123"
+        temp = db[key]
+        self.assertEqual(temp, "123")
+        db.stop()
+
+    def test_dict_len(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        db['Aa'] = "42"
+        self.assertEqual(len(db), 2)
+        db.stop()
+
+    def test_dict_item_in(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        self.assertIn('dict_test', db)
+        self.assertNotIn('Aa', db)
+        db.stop()
+
+    def test_dict_item_del(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        del db['dict_test']
+        with self.assertRaises(KeyError):
+            temp = db['dict_test']
+        db.stop()
+
 if __name__ == '__main__':
     unittest.main()
