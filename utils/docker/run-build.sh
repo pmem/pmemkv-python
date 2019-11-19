@@ -58,6 +58,7 @@ cd $WORKDIR
 python3 setup.py install --user
 cd $WORKDIR/tests
 python3 -m unittest -v pmemkv_tests.py
+python3 -m unittest -v  nontrivial_data_tests.py
 
 echo
 echo "##########################################################"
