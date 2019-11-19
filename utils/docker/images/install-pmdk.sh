@@ -31,23 +31,33 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# install-pmdk.sh <package_type> - installs PMDK (stable) packages
+# install-pmdk.sh <package_type> - installs PMDK
 #
 
 set -e
 
-git clone https://github.com/pmem/pmdk
-cd pmdk
-git checkout 1.7
+PREFIX=/usr
+PACKAGE_TYPE=$1
 
-make -j$(nproc) BUILD_PACKAGE_CHECK=n $1
-if [ "$1" = "dpkg" ]; then
-      sudo dpkg -i dpkg/libpmem_*.deb dpkg/libpmem-dev_*.deb
-      sudo dpkg -i dpkg/libpmemobj_*.deb dpkg/libpmemobj-dev_*.deb
-elif [ "$1" = "rpm" ]; then
-      sudo rpm -i rpm/*/pmdk-debuginfo-*.rpm
-      sudo rpm -i rpm/*/libpmem-*.rpm
-      sudo rpm -i rpm/*/libpmemobj-*.rpm
+# stable-1.7: Merge pull request #4097 from pmem/stable-1.6, 5.11.2019
+PMDK_VERSION="31cea307b2b7c0c0d0d209b8c5f47adc9d1353a0"
+
+git clone https://github.com/pmem/pmdk --shallow-since=2019-09-26
+cd pmdk
+git checkout $PMDK_VERSION
+
+if [ "$PACKAGE_TYPE" = "" ]; then
+	make -j$(nproc) install prefix=$PREFIX
+else
+	make -j$(nproc) BUILD_PACKAGE_CHECK=n $PACKAGE_TYPE
+	if [ "$PACKAGE_TYPE" = "dpkg" ]; then
+		sudo dpkg -i dpkg/libpmem_*.deb dpkg/libpmem-dev_*.deb
+		sudo dpkg -i dpkg/libpmemobj_*.deb dpkg/libpmemobj-dev_*.deb
+	elif [ "$PACKAGE_TYPE" = "rpm" ]; then
+		sudo rpm -i rpm/*/pmdk-debuginfo-*.rpm
+		sudo rpm -i rpm/*/libpmem-*.rpm
+		sudo rpm -i rpm/*/libpmemobj-*.rpm
+	fi
 fi
 
 cd ..
