@@ -39,12 +39,14 @@ from pmemkv.pmemkv import Database,\
 
 class TestKVEngine(unittest.TestCase):
 
-    engine = r"vsmap"
-    config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.engine = r"vsmap"
+        self.config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
+        self.key = r""
+        self.key_and_value = r""
+        self.formatter = r"{},"
 
-    key = r""
-    key_and_value = r""
-    formatter = r"{},"
 
     def all_and_each(self, key = '', value = ''):
         if value != '':
