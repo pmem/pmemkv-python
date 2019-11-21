@@ -36,9 +36,13 @@
 
 set -e
 
-package_type=$1
+PREFIX=/usr
+PACKAGE_TYPE=$1
 
-stable_pmemkv_version="1.0"
+# master: Add [count|get]_[above|below] API support for stree engine (#523); 18.11.2019
+current_pmemkv_version="6fbad66aaffa0387308de5beced6aa5fe30fff3b"
+# stable-1.0: Merge pull request #528 from ldorau/Do-not-add-pmemkv_config...; 14.11.2019
+stable_1_pmemkv_version="a3735b5393f0d5411ef8a2468b36d2a1ed00c0a1"
 
 prepare_pmemkv () {
 	pmemkv_version="$1"
@@ -48,18 +52,20 @@ prepare_pmemkv () {
 	cd build
 	cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_INSTALL_PREFIX=$PREFIX \
-		-DCPACK_GENERATOR=$package_type
-	make package
+		-DCPACK_GENERATOR=$PACKAGE_TYPE \
+		-DBUILD_TESTS=OFF
+	make -j$(nproc) package
 	cd ..
 	mkdir /opt/"$version_name"
-	mv  build/* /opt/"$version_name"
+	mv build/* /opt/"$version_name"
 	rm -rf build
 }
 
 git clone https://github.com/pmem/pmemkv
 cd pmemkv
 
-prepare_pmemkv "$stable_pmemkv_version" "pmemkv-stable"
+prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
+prepare_pmemkv "$stable_1_pmemkv_version" "pmemkv-stable-1.0"
 
 cd ..
 rm -r pmemkv
