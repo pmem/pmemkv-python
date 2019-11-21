@@ -35,10 +35,7 @@ import json
 import urllib.request
 import os.path
 
-from pmemkv.pmemkv import Database,\
-    PMEMKV_STATUS_INVALID_ARGUMENT, \
-    PMEMKV_STATUS_CONFIG_PARSING_ERROR, \
-    PMEMKV_STATUS_WRONG_ENGINE_NAME
+from pmemkv.pmemkv import Database
 
 class TestNaughtyStrings(unittest.TestCase):
 

@@ -32,11 +32,7 @@
 
 import unittest
 
-from pmemkv.pmemkv import Database,\
-    PMEMKV_STATUS_INVALID_ARGUMENT, \
-    PMEMKV_STATUS_CONFIG_PARSING_ERROR, \
-    PMEMKV_STATUS_WRONG_ENGINE_NAME
-
+from pmemkv import Database
 class TestKVEngine(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
@@ -208,7 +204,7 @@ class TestKVEngine(unittest.TestCase):
             self.assertFalse(True)
         except Exception as e:
             # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_INVALID_ARGUMENT)
+            self.assertEqual(e.args[0], Database.PMEMKV_STATUS_INVALID_ARGUMENT)
         self.assertEqual(db, None)
 
     def test_exception_on_start_when_config_is_malformed(self):
@@ -218,7 +214,7 @@ class TestKVEngine(unittest.TestCase):
             self.assertFalse(True)
         except Exception as e:
             # "Creating a pmemkv config from JSON string failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_CONFIG_PARSING_ERROR)
+            self.assertEqual(e.args[0], Database.PMEMKV_STATUS_CONFIG_PARSING_ERROR)
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_engine_is_invalid(self):
@@ -228,7 +224,7 @@ class TestKVEngine(unittest.TestCase):
             self.assertFalse(True)
         except Exception as e:
             # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_WRONG_ENGINE_NAME)
+            self.assertEqual(e.args[0], Database.PMEMKV_STATUS_WRONG_ENGINE_NAME)
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_path_is_invalid(self):
@@ -238,7 +234,7 @@ class TestKVEngine(unittest.TestCase):
             self.assertFalse(True)
         except Exception as e:
             # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_INVALID_ARGUMENT)
+            self.assertEqual(e.args[0], Database.PMEMKV_STATUS_INVALID_ARGUMENT)
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_path_is_wrong_type(self):
@@ -248,7 +244,7 @@ class TestKVEngine(unittest.TestCase):
             self.assertFalse(True)
         except Exception as e:
             # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_INVALID_ARGUMENT)
+            self.assertEqual(e.args[0], Database.PMEMKV_STATUS_INVALID_ARGUMENT)
         self.assertEqual(db, None)
 
     def test_uses_get_keys(self):
