@@ -38,11 +38,11 @@ python3 setup.py install --user
 
 ## Testing
 
-Python bindings includes automated unittest cases.
+Python bindings includes automated test cases.
 Use following command to run test cases:
 ```sh
 cd tests
-python3 -m unittest -v pmemkv_tests.py
+python3 -m pytest -v pmemkv_tests.py
 ```
 
 ## Example
