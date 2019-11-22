@@ -505,5 +505,14 @@ class TestKVEngine(unittest.TestCase):
             temp = db['dict_test']
         db.stop()
 
+    def test_databases_interferation(self):
+        db1 = Database(self.engine, self.config)
+        db2 = Database(self.engine, self.config)
+        db1['1'] = "A"
+        db2['2'] = "B"
+        with self.assertRaises(KeyError):
+            temp = db2['1']
+        db1.stop()
+        db2.stop()
 if __name__ == '__main__':
     unittest.main()
