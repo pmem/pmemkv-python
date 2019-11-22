@@ -29,13 +29,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
-from distutils.core import setup, Extension
+import setuptools
 
-link_modules = Extension('pmemkv_NI', ['pmemkv/kvengine.cc'], libraries = ['pmemkv', 'pmemkv_json_config'])
+link_modules = setuptools.Extension('pmemkv_NI', ['pmemkv/kvengine.cc'], libraries = ['pmemkv', 'pmemkv_json_config'])
 
-setup(name= 'Python_Pmemkv',
+setuptools.setup(name= 'Python_Pmemkv',
     version = '0.9',
     description = 'Python bindings for PMEMKV Engine',
-    packages = ['pmemkv', 'pmemkv_json_config'],
-    package_dir = {'pmemkv': '.', 'pmemkv_json_config': '.'},
+    packages = setuptools.find_packages(),
     ext_modules = [link_modules])
