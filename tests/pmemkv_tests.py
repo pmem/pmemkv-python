@@ -407,7 +407,7 @@ class TestKVEngine(unittest.TestCase):
         db.put(r"BC", r"6")
 
         self.formatter = r"{},{}|"
-    
+
         self.key_and_value = r""
         db.get_above(r"B", self.all_and_each)
         self.assertEqual(self.key_and_value, r"BB,5|BC,6|")
@@ -504,6 +504,16 @@ class TestKVEngine(unittest.TestCase):
         with self.assertRaises(KeyError):
             temp = db['dict_test']
         db.stop()
+
+    def test_databases_interferation(self):
+        db1 = Database(self.engine, self.config)
+        db2 = Database(self.engine, self.config)
+        db1['1'] = "A"
+        db2['2'] = "B"
+        with self.assertRaises(KeyError):
+            temp = db2['1']
+        db1.stop()
+        db2.stop()
 
 if __name__ == '__main__':
     unittest.main()
