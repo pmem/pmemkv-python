@@ -63,6 +63,7 @@ Pmemkv_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 	return (PyObject *) self;
 }
 
+
 static int Pmemkv_init(PmemkvObject *self)
 {
 	return 0;
@@ -101,8 +102,16 @@ pmemkv_NI_Start(PmemkvObject *self, PyObject* args) {
 
 static PyObject *
 pmemkv_NI_Stop(PmemkvObject *self) {
-	pmemkv_close(self->db);
+	if( self->db != NULL)
+		pmemkv_close(self->db);
+	self->db = NULL;
 	Py_RETURN_NONE;
+}
+
+static void
+Pmemkv_dealloc(PmemkvObject *self) {
+    pmemkv_NI_Stop(self);
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 // "All" Methods.
@@ -421,7 +430,7 @@ static PyTypeObject PmemkvType = {
 	.tp_name = "pmemkv.pmemkv_NI",
 	.tp_basicsize = sizeof(PmemkvObject),
 	.tp_itemsize = 0,
-	.tp_dealloc = 0,
+	.tp_dealloc = (destructor) Pmemkv_dealloc,
 	.tp_print = 0,
 	.tp_getattr = 0,
 	.tp_setattr = 0,

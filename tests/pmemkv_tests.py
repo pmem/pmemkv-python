@@ -78,22 +78,15 @@ class TestKVEngine(unittest.TestCase):
         self.assertEqual(db.get(r"key1"), None)
         db.stop()
 
-    def test_start_engine(self):
+    def test_stop_engine_multiple_times(self):
+        """ In case of failure, this test cause segmentation fault.
+        As there is no way to catch segmentation fault in python, just do not
+        assert anything.
+        """
         db = Database(self.engine, self.config)
-        self.assertNotEqual(db, None)
-        self.assertFalse(db.stopped)
         db.stop()
-        self.assertTrue(db.stopped)
-
-    def test_stops_engine_multiple_times(self):
-        db = Database(self.engine, self.config)
-        self.assertFalse(db.stopped)
         db.stop()
-        self.assertTrue(db.stopped)
         db.stop()
-        self.assertTrue(db.stopped)
-        db.stop()
-        self.assertTrue(db.stopped)
 
     def test_gets_missing_key(self):
         db = Database(self.engine, self.config)
