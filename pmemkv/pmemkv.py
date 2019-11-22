@@ -47,21 +47,11 @@ PMEMKV_STATUS_TRANSACTION_SCOPE_ERROR = 10
 
 class Database():
 
-    # Getter for __stopped
-    @property
-    def stopped(self):
-        return self.__stopped
-
     # Starts the given engine.
     # Takes engine name and configuration from the end user.
     def __init__(self, engine, config):
-        self.__stopped = False
         self.db = pmemkv_NI.pmemkv_NI()
-        try:
-            result = self.db.start(engine, config)
-        except Exception as e:
-            self.__stopped = True
-            raise e
+        self.db.start(engine, config)
 
     def __setitem__(self, key, value):
         self.put(key,value)
@@ -83,9 +73,7 @@ class Database():
 
     # Stops the running engine.
     def stop(self):
-        if not self.__stopped:
-            self.__stopped = True
-            self.db.stop()
+        self.db.stop()
 
     # Puts the key/value pair into pmemkv datastore.
     # Takes key & value from the end user.
