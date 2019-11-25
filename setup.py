@@ -31,9 +31,9 @@
 '''
 import setuptools
 
-link_modules = setuptools.Extension('pmemkv_NI', ['pmemkv/kvengine.cc'], libraries = ['pmemkv', 'pmemkv_json_config'])
+link_modules = setuptools.Extension('_pmemkv', ['pmemkv/kvengine.cc'], libraries = ['pmemkv', 'pmemkv_json_config'])
 
-setuptools.setup(name= 'Python_Pmemkv',
+setuptools.setup(name= 'pmemkv',
     version = '0.9',
     description = 'Python bindings for PMEMKV Engine',
     packages = setuptools.find_packages(),
