@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
 
-import pmemkv_NI
+import _pmemkv
 
 class Database():
     PMEMKV_STATUS_OK = 0
@@ -54,7 +54,7 @@ class Database():
     # Takes engine name and configuration from the end user.
     def __init__(self, engine, config):
         self.__stopped = False
-        self.db = pmemkv_NI.pmemkv_NI()
+        self.db = _pmemkv.pmemkv_NI()
         try:
             result = self.db.start(engine, config)
         except Exception as e:
