@@ -478,14 +478,14 @@ static PyTypeObject PmemkvType = {
 // Module defination.
 static struct PyModuleDef pmemkv_NI_module = {
 	PyModuleDef_HEAD_INIT,
-	"pmemkv_NI", /* name of module */
+	"_pmemkv", /* name of module */
 	NULL, /* module documentation, may be NULL */
 	-1, /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
 };
 
 // Creating dynamic module.
 PyMODINIT_FUNC
-PyInit_pmemkv_NI(void) {
+PyInit__pmemkv(void) {
 	PyObject *m;
 	if (PyType_Ready(&PmemkvType) < 0)
 		return NULL;
