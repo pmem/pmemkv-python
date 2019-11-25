@@ -57,8 +57,8 @@ echo "##########################################################"
 cd $WORKDIR
 python3 setup.py install --user
 cd $WORKDIR/tests
-python3 -X faulthandler -m unittest -v pmemkv_tests.py
-python3 -X faulthandler -m unittest -v  nontrivial_data_tests.py
+python3 -X faulthandler -m pytest -v pmemkv_tests.py
+python3 -X faulthandler -m pytest -v  nontrivial_data_tests.py
 
 echo
 echo "##########################################################"
