@@ -508,6 +508,13 @@ class TestKVEngine(unittest.TestCase):
         db1.stop()
         db2.stop()
 
+    def test_get_same_element_two_times(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        val1 = db['dict_test']
+        val2 = db['dict_test']
+        self.assertEqual(val1, val2)
+        db.stop()
 
     def test_delete_same_element_two_times(self):
         db = Database(self.engine, self.config)
