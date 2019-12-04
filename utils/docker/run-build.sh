@@ -55,9 +55,11 @@ echo "##########################################################"
 echo "### Verifying building, installation and tests execution  "
 echo "##########################################################"
 cd $WORKDIR
-python3 setup.py install --user
+python3 setup.py bdist_wheel
+pip3 install dist/pmemkv-*.whl --user
 cd $WORKDIR/tests
-python3 -m unittest -v pmemkv_tests.py
+python3 -X faulthandler -m pytest -v pmemkv_tests.py
+python3 -X faulthandler -m pytest -v  nontrivial_data_tests.py
 
 echo
 echo "##########################################################"

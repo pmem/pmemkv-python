@@ -29,12 +29,44 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''
-import setuptools
 
-link_modules = setuptools.Extension('_pmemkv', ['pmemkv/kvengine.cc'], libraries = ['pmemkv', 'pmemkv_json_config'])
+import unittest
+import json
+import urllib.request
+import os.path
 
-setuptools.setup(name= 'pmemkv',
-    version = '0.9',
-    description = 'Python bindings for PMEMKV Engine',
-    packages = setuptools.find_packages(),
-    ext_modules = [link_modules])
+from pmemkv.pmemkv import Database,\
+    PMEMKV_STATUS_INVALID_ARGUMENT, \
+    PMEMKV_STATUS_CONFIG_PARSING_ERROR, \
+    PMEMKV_STATUS_WRONG_ENGINE_NAME
+
+class TestNaughtyStrings(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.engine = r"vsmap"
+        self.config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
+        self.strings = self._get_naughty_strings("https://raw.githubusercontent.com/minimaxir/big-list-of-naughty-strings/master/blns.json")
+
+    def _get_naughty_strings(self, url):
+        file_name = "blns.json"
+        data = {}
+        if not os.path.exists(file_name):
+            urllib.request.urlretrieve(url, file_name)
+        with open(file_name) as f:
+            data = json.load(f)
+        return data
+
+    def test_puts_tricky_keys_and_values(self):
+        db = Database(self.engine, self.config)
+        data = {}
+        with open("blns.json") as f:
+            data = json.load(f)
+        for val in data:
+            db.put(val, val)
+        for val in data:
+            self.assertEqual(db.get_string(val).decode(), val)
+        db.stop()
+
+if __name__ == '__main__':
+    unittest.main()

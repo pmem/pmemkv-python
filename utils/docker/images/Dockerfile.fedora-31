@@ -72,8 +72,10 @@ RUN dnf update -y \
 	unzip \
 	wget \
 	which \
+	python3-pip \
 && dnf clean all
 
+RUN pip3 install pytest setuptools wheel
 # Install glibc-debuginfo
 RUN dnf debuginfo-install -y glibc
 

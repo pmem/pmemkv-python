@@ -39,12 +39,14 @@ from pmemkv.pmemkv import Database,\
 
 class TestKVEngine(unittest.TestCase):
 
-    engine = r"vsmap"
-    config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.engine = r"vsmap"
+        self.config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
+        self.key = r""
+        self.key_and_value = r""
+        self.formatter = r"{},"
 
-    key = r""
-    key_and_value = r""
-    formatter = r"{},"
 
     def all_and_each(self, key = '', value = ''):
         if value != '':
@@ -76,22 +78,15 @@ class TestKVEngine(unittest.TestCase):
         self.assertEqual(db.get(r"key1"), None)
         db.stop()
 
-    def test_start_engine(self):
+    def test_stop_engine_multiple_times(self):
+        """ In case of failure, this test cause segmentation fault.
+        As there is no way to catch segmentation fault in python, just do not
+        assert anything.
+        """
         db = Database(self.engine, self.config)
-        self.assertNotEqual(db, None)
-        self.assertFalse(db.stopped)
         db.stop()
-        self.assertTrue(db.stopped)
-
-    def test_stops_engine_multiple_times(self):
-        db = Database(self.engine, self.config)
-        self.assertFalse(db.stopped)
         db.stop()
-        self.assertTrue(db.stopped)
         db.stop()
-        self.assertTrue(db.stopped)
-        db.stop()
-        self.assertTrue(db.stopped)
 
     def test_gets_missing_key(self):
         db = Database(self.engine, self.config)
@@ -405,7 +400,7 @@ class TestKVEngine(unittest.TestCase):
         db.put(r"BC", r"6")
 
         self.formatter = r"{},{}|"
-    
+
         self.key_and_value = r""
         db.get_above(r"B", self.all_and_each)
         self.assertEqual(self.key_and_value, r"BB,5|BC,6|")
@@ -466,6 +461,52 @@ class TestKVEngine(unittest.TestCase):
         self.assertEqual(self.key_and_value, r"")
 
         db.stop()
+
+    def test_dict_set_item(self):
+        db = Database(self.engine, self.config)
+        db['string_value'] = "test"
+        self.assertEqual(db['string_value'], "test")
+        db.stop()
+
+    def test_dict_get_item(self):
+        db = Database(self.engine, self.config)
+        key = "dict_test"
+        db[key] = "123"
+        temp = db[key]
+        self.assertEqual(temp, "123")
+        db.stop()
+
+    def test_dict_len(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        db['Aa'] = "42"
+        self.assertEqual(len(db), 2)
+        db.stop()
+
+    def test_dict_item_in(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        self.assertIn('dict_test', db)
+        self.assertNotIn('Aa', db)
+        db.stop()
+
+    def test_dict_item_del(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        del db['dict_test']
+        with self.assertRaises(KeyError):
+            temp = db['dict_test']
+        db.stop()
+
+    def test_databases_interference(self):
+        db1 = Database(self.engine, self.config)
+        db2 = Database(self.engine, self.config)
+        db1['1'] = "A"
+        db2['2'] = "B"
+        with self.assertRaises(KeyError):
+            temp = db2['1']
+        db1.stop()
+        db2.stop()
 
 if __name__ == '__main__':
     unittest.main()

@@ -76,8 +76,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 	sudo \
 	wget \
 	whois \
+	python3-pip \
  && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install pytest setuptools wheel
 # Install pmdk
 COPY install-pmdk.sh install-pmdk.sh
 RUN ./install-pmdk.sh dpkg
