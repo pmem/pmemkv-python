@@ -1,23 +1,30 @@
 from pmemkv import Database
 
+def callback(key):
+    mem_view = memoryview(key)
+    print(mem_view.tobytes().decode())
+
 print ("Starting engine")
 db = Database(r"vsmap", '{"path":"/dev/shm","size":1073741824}')
 
 print ("Put new key")
-db.put(r"key1", r"value1")
+db.put("key1", "value1")
 assert db.count_all() == 1
 
 print ("Reading key back")
-assert db.get(r"key1") == r"value1"
+assert db.get_string("key1") == "value1"
 
 print ("Iterating existing keys")
-db.put(r"key2", r"value2")
-db.put(r"key3", r"value3")
-db.get_keys_strings(lambda k: print ("  visited: {}".format(k.decode())))
+db.put("key2", "value2")
+db.put("key3", "value3")
+db.get_keys(lambda k: print(f"visited: {k}"))
+
+print("Get single key")
+db.get("key1", callback)
 
 print ("Removing existing key")
-db.remove(r"key1")
-assert not db.exists(r"key1")
+db.remove("key1")
+assert not db.exists("key1")
 
 print ("Stopping engine")
 db.stop()
