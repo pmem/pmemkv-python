@@ -258,11 +258,6 @@ class TestKVEngine(unittest.TestCase):
         db.get_keys(self.all_and_each)
         self.assertEqual(self.key, r"<1>,<2>,")
 
-        db.put(r"记!", r"RR")
-        self.key = r""
-        db.get_keys_strings(self.all_and_each_strings)
-        self.assertEqual(self.key, r"<1>,<2>,<记!>,")
-
         db.stop()
 
     def test_uses_get_keys_above(self):
@@ -280,11 +275,6 @@ class TestKVEngine(unittest.TestCase):
         db.get_keys_above(r"B", self.all_and_each)
         self.assertEqual(self.key, r"BB,BC,")
 
-        db.put(r"记!", r"RR")
-        self.key = r""
-        db.get_keys_strings_above(r"", self.all_and_each_strings)
-
-        self.assertEqual(self.key, r"A,AB,AC,B,BB,BC,记!,")
         db.stop()
 
     def test_uses_get_keys_below(self):
@@ -302,10 +292,6 @@ class TestKVEngine(unittest.TestCase):
         db.get_keys_below(r"B", self.all_and_each)
         self.assertEqual(self.key, r"A,AB,AC,")
 
-        db.put(r"记!", r"RR")
-        self.key = r""
-        db.get_keys_strings_below("\uFFFF", self.all_and_each_strings)
-        self.assertEqual(self.key, r"A,AB,AC,B,BB,BC,记!,")
         db.stop()
 
     def test_uses_get_keys_between(self):
@@ -322,11 +308,6 @@ class TestKVEngine(unittest.TestCase):
         self.key = r""
         db.get_keys_between(r"A", r"B", self.all_and_each)
         self.assertEqual(self.key, r"AB,AC,")
-
-        db.put(r"记!", r"RR")
-        self.key = r""
-        db.get_keys_strings_between(r"B", "\uFFFF", self.all_and_each_strings)
-        self.assertEqual(self.key, r"BB,BC,记!,")
 
         self.key = r""
         db.get_keys_between(r"", r"", self.all_and_each)
@@ -386,10 +367,6 @@ class TestKVEngine(unittest.TestCase):
         db.get_all(self.all_and_each)
         self.assertEqual(self.key_and_value, r"<1>,<one>|<2>,<two>|")
 
-        db.put(r"记!", r"RR")
-        self.key_and_value = r""
-        db.get_all_string(self.all_and_each_strings)
-        self.assertEqual(self.key_and_value, r"<1>,<one>|<2>,<two>|<记!>,<RR>|")
 
         db.stop()
 
@@ -408,10 +385,6 @@ class TestKVEngine(unittest.TestCase):
         db.get_above(r"B", self.all_and_each)
         self.assertEqual(self.key_and_value, r"BB,5|BC,6|")
 
-        db.put(r"记!", r"RR")
-        self.key_and_value = r""
-        db.get_string_above(r"", self.all_and_each_strings)
-        self.assertEqual(self.key_and_value, r"A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|")
 
         db.stop()
 
@@ -431,9 +404,6 @@ class TestKVEngine(unittest.TestCase):
         self.assertEqual(self.key_and_value, r"A,1|AB,2|")
 
         db.put(r"记!", r"RR")
-        self.key_and_value = r""
-        db.get_string_below("\uFFFD", self.all_and_each_strings)
-        self.assertEqual(self.key_and_value, r"A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|")
 
         db.stop()
 
@@ -452,16 +422,7 @@ class TestKVEngine(unittest.TestCase):
         db.get_between(r"A", r"B", self.all_and_each)
         self.assertEqual(self.key_and_value, r"AB,2|AC,3|")
 
-        db.put(r"记!", r"RR")
-        self.key_and_value = r""
-        db.get_string_between(r"B", "\uFFFD", self.all_and_each_strings)
-        self.assertEqual(self.key_and_value, r"BB,5|BC,6|记!,RR|")
 
-        self.key_and_value = r""
-        db.get_between(r"", r"", self.all_and_each)
-        db.get_between(r"A", r"A", self.all_and_each)
-        db.get_between(r"B", r"A", self.all_and_each)
-        self.assertEqual(self.key_and_value, r"")
 
         db.stop()
 
