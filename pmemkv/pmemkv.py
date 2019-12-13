@@ -102,26 +102,6 @@ class Database():
     def get_keys_between(self, key1, key2, func):
         return self.db.get_keys_between(key1, key2, func)
 
-    # Fetches all the keys from the begining of the pmemkv datastore till key matched and encodes them.
-    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def get_keys_strings(self, func, encoding = 'utf-8'):
-        return self.db.get_keys(lambda k: func(k.encode(encoding)))
-
-    # Fetches all the keys from the begining of the pmemkv datastore till key matched and encodes them.
-    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def get_keys_strings_above(self, key, func, encoding = 'utf-8'):
-        return self.db.get_keys_above(key, lambda k: func(k.encode(encoding)))
-
-    # Fetches all the keys from the key matched in the pmemkv datastore till end and encodes them.
-    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def get_keys_strings_below(self, key, func, encoding = 'utf-8'):
-        return self.db.get_keys_below(key, lambda k: func(k.encode(encoding)))
-
-    # Fetches all the keys present, between key1 and key2 from pmemkv datastore and encodes them.
-    # Takes key1, key2, callback and encoding algorithm from the end user and sends the resulted encoded keys through callback.
-    def get_keys_strings_between(self, key1, key2, func, encoding = 'utf-8'):
-        return self.db.get_keys_between(key1, key2, lambda k: func(k.encode(encoding)))
-
     # Counts the total number of keys in the pmemkv datastore.
     # Returns total number of keys.
     def count_all(self):
@@ -163,31 +143,11 @@ class Database():
     def get_between(self, key1, key2, func):
         return self.db.get_between(key1, key2, func)
 
-    # Fetches all the key/value pairs from pmemkv datastore and encodes them.
-    # Takes callback and encoding algorithm from the end user and sends the resulted encoded key/value pairs through callback.
-    def get_all_string(self, func, encoding = 'utf-8'):
-        return self.db.get_all(lambda k, v: func(k.encode(encoding), v.encode(encoding)))
-
-    # Fetches all the key/value pairs from the begining of the pmemkv datastore till key matched and encodes them.
-    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded key/value pairs through callback.
-    def get_string_above(self, key, func, encoding = 'utf-8'):
-        return self.db.get_above(key, lambda k, v: func(k.encode(encoding), v.encode(encoding)))
-
-    # Fetches all the key/value pairs from the key matched in the pmemkv datastore till end and encodes them.
-    # Takes key, callback and encoding algorithm from the end user and sends the resulted encoded key/value pairs through callback.
-    def get_string_below(self, key, func, encoding = 'utf-8'):
-        return self.db.get_below(key, lambda k, v: func(k.encode(encoding), v.encode(encoding)))
-
-    # Fetches all the key/value pairs present, between key1 and key2 from pmemkv datastore and encodes them.
-    # Takes key1, key2, callback and encoding algorithm from the end user and sends the resulted encoded key/value pairs through callback.
-    def get_string_between(self, key1, key2, func, encoding = 'utf-8'):
-        return self.db.get_between(key1, key2, lambda k, v: func(k.encode(encoding), v.encode(encoding)))
-
     # Verifies the key presence in pmemkv datastore.
     # Takes key from the end user and returns the key presence.
     def exists(self, key):
         return self.db.exists(key)
-    
+
     # Gets the value for the given key from pmemkv datastore.
     # Takes key from the end user and returns the value.
     def get(self, key, func):
