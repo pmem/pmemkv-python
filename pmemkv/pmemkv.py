@@ -57,7 +57,7 @@ class Database():
         self.put(key,value)
 
     def __getitem__(self, key):
-        item = self.get(key)
+        item = self.get_string(key)
         if not item:
             raise KeyError(key)
         return item
@@ -188,14 +188,13 @@ class Database():
     
     # Gets the value for the given key from pmemkv datastore.
     # Takes key from the end user and returns the value.
-    def get(self, key):
-        return self.db.get(key)
+    def get(self, key, func):
+        return self.db.get(key, func)
 
     # Gets the value for the given key from pmemkv datastore.
     # Takes key and encoding algorithm from the end user and returns the encoded value.
-    def get_string(self, key, encoding = 'utf-8'):
-        value = self.db.get(key)
-        return None if (value == None) else value.encode(encoding)
+    def get_string(self, key):
+        return self.db.get_string(key)
 
     # Takes key from the end user and returns the key removal status.
     def remove(self, key):
