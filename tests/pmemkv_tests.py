@@ -50,7 +50,10 @@ class TestKVEngine(unittest.TestCase):
 
     def all_and_each(self, key = '', value = ''):
         if value != '':
-            self.key_and_value += self.formatter.format(key, value)
+            value_mem_view = memoryview(value)
+            value_text_representation = value_mem_view.tobytes().decode('utf-8')
+            self.key_and_value += self.formatter.format(key,
+                              value_text_representation)
         else:
             self.key += self.formatter.format(key)
 
@@ -68,14 +71,14 @@ class TestKVEngine(unittest.TestCase):
         db = Database(r"blackhole", self.config)
         self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get_string(r"key1"), None)
         db.put(r"key1", r"value123")
         self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get_string(r"key1"), None)
         self.assertTrue(db.remove(r"key1"))
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get_string(r"key1"), None)
         db.stop()
 
     def test_stop_engine_multiple_times(self):
@@ -91,7 +94,7 @@ class TestKVEngine(unittest.TestCase):
     def test_gets_missing_key(self):
         db = Database(self.engine, self.config)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get_string(r"key1"), None)
         db.stop()
 
     def test_puts_basic_values(self):
@@ -99,27 +102,27 @@ class TestKVEngine(unittest.TestCase):
         self.assertFalse(db.exists(r"key1"))
         db.put(r"key1", r"value1")
         self.assertTrue(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), r"value1")
+        self.assertEqual(db.get_string(r"key1"), r"value1")
         db.stop()
 
     def test_puts_binary_keys(self):
         db = Database(self.engine, self.config)
         db.put("A\0B\0\0C", r"value1")
         self.assertTrue(db.exists("A\0B\0\0C"))
-        self.assertEqual(db.get("A\0B\0\0C"), r"value1")
+        self.assertEqual(db.get_string("A\0B\0\0C"), r"value1")
         db.stop()
 
     def test_puts_binary_values(self):
         db = Database(self.engine, self.config)
         db.put(r"key1", "A\0B\0\0C")
-        self.assertEqual(db.get(r"key1"), "A\0B\0\0C")
+        self.assertEqual(db.get_string(r"key1"), "A\0B\0\0C")
         db.stop()
 
     def test_puts_complex_value(self):
         db = Database(self.engine, self.config)
         val = r"one\ttwo or <p>three</p>\n {four}   and ^five"
         db.put(r"key1", val)
-        self.assertEqual(db.get(r"key1"), val)
+        self.assertEqual(db.get_string(r"key1"), val)
         db.stop()
 
     def test_puts_empty_key(self):
@@ -128,11 +131,11 @@ class TestKVEngine(unittest.TestCase):
         db.put(r" ", r"single-space")
         db.put(r"\t\t", r"two-tab")
         self.assertTrue(db.exists(r""))
-        self.assertEqual(db.get(r""), r"empty")
+        self.assertEqual(db.get_string(r""), r"empty")
         self.assertTrue(db.exists(r" "))
-        self.assertEqual(db.get(r" "), r"single-space")
+        self.assertEqual(db.get_string(r" "), r"single-space")
         self.assertTrue(db.exists(r"\t\t"))
-        self.assertEqual(db.get(r"\t\t"), r"two-tab")
+        self.assertEqual(db.get_string(r"\t\t"), r"two-tab")
         db.stop()
 
     def test_puts_empty_values(self):
@@ -140,9 +143,9 @@ class TestKVEngine(unittest.TestCase):
         db.put(r"empty", r"")
         db.put(r"single-space", r" ")
         db.put(r"two-tab", r"\t\t")
-        self.assertEqual(db.get(r"empty"), r"")
-        self.assertEqual(db.get(r"single-space"), r" ")
-        self.assertEqual(db.get(r"two-tab"), r"\t\t")
+        self.assertEqual(db.get_string(r"empty"), r"")
+        self.assertEqual(db.get_string(r"single-space"), r" ")
+        self.assertEqual(db.get_string(r"two-tab"), r"\t\t")
         db.stop()
 
     def test_puts_multiple_values(self):
@@ -151,21 +154,21 @@ class TestKVEngine(unittest.TestCase):
         db.put(r"key2", r"value2")
         db.put(r"key3", r"value3")
         self.assertTrue(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), r"value1")
+        self.assertEqual(db.get_string(r"key1"), r"value1")
         self.assertTrue(db.exists(r"key2"))
-        self.assertEqual(db.get(r"key2"), r"value2")
+        self.assertEqual(db.get_string(r"key2"), r"value2")
         self.assertTrue(db.exists(r"key3"))
-        self.assertEqual(db.get(r"key3"), r"value3")
+        self.assertEqual(db.get_string(r"key3"), r"value3")
         db.stop()
 
     def test_puts_overwriting_existing_value(self):
         db = Database(self.engine, self.config)
         db.put(r"key1", r"value1")
-        self.assertEqual(db.get(r"key1"), r"value1")
+        self.assertEqual(db.get_string(r"key1"), r"value1")
         db.put(r"key1", r"value123")
-        self.assertEqual(db.get(r"key1"), r"value123")
+        self.assertEqual(db.get_string(r"key1"), r"value123")
         db.put(r"key1", r"asdf")
-        self.assertEqual(db.get(r"key1"), r"asdf")
+        self.assertEqual(db.get_string(r"key1"), r"asdf")
         db.stop()
 
     def test_puts_utf8_key(self):
@@ -173,25 +176,25 @@ class TestKVEngine(unittest.TestCase):
         val = r"to remember, note, record"
         db.put(r"记", val)
         self.assertTrue(db.exists(r"记"))
-        self.assertEqual(db.get(r"记"), val)
+        self.assertEqual(db.get_string(r"记"), val)
         db.stop()
 
     def test_puts_utf8_value(self):
         db = Database(self.engine, self.config)
         val = r"记 means to remember, note, record"
         db.put(r"key1", val)
-        self.assertEqual(db.get_string(r"key1").decode(), val)
+        self.assertEqual(db.get_string(r"key1"), val)
         db.stop()
 
     def test_removes_key_and_value(self):
         db = Database(self.engine, self.config)
         db.put(r"key1", r"value1")
         self.assertTrue(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), r"value1")
+        self.assertEqual(db.get_string(r"key1"), r"value1")
         self.assertTrue(db.remove(r"key1"))
         self.assertFalse(db.remove(r"key1"))
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get(r"key1"), None)
+        self.assertEqual(db.get_string(r"key1"), None)
         db.stop()
 
     def test_throws_exception_on_start_when_config_is_empty(self):
@@ -474,6 +477,60 @@ class TestKVEngine(unittest.TestCase):
         db[key] = "123"
         temp = db[key]
         self.assertEqual(temp, "123")
+        db.stop()
+
+    def test_get_copy_to_class_member(self):
+        class Callback:
+            def __init__(self):
+                self.result = None
+            def call(self, key):
+                self.result = memoryview(key)
+        callback = Callback()
+        db = Database(self.engine, self.config)
+        key = "dict_test"
+        val = "123"
+        db[key] = val
+        db.get(key, callback.call)
+        self.assertEqual(callback.result.tobytes(), "123".encode('utf-8'))
+        db.stop()
+
+    def test_get_assert_in_callback(self):
+        def callback (key):
+            self.assertEqual(memoryview(key).tobytes(), "123".encode('utf-8'))
+        key = "dict_test"
+        val = "123"
+        db = Database(self.engine, self.config)
+        db[key] = val
+        db.get(key, callback)
+        db.stop()
+
+    def test_get_exception_in_callback(self):
+        class LocalException(Exception):
+            pass
+        def callback(key):
+            raise LocalException('TestException')
+        db = Database(self.engine, self.config)
+        key = "dict_test"
+        val = "123"
+        db[key] = val
+        try:
+            db.get(key, callback)
+        except LocalException as e:
+            db.stop()
+            self.assertEqual(type(e).__name__ , "LocalException")
+        db.stop()
+
+    def test_get_AttributeError_in_callback(self):
+        def callback (key):
+            self.assertEqual(key.NonexistentMethod(), "123".encode('utf-8'))
+        key = "dict_test"
+        val = "123"
+        db = Database(self.engine, self.config)
+        db[key] = val
+        try:
+            db.get(key, callback)
+        except Exception as e:
+            assert type(e).__name__ == "AttributeError"
         db.stop()
 
     def test_dict_len(self):
