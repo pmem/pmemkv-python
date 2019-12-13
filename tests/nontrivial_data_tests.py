@@ -65,7 +65,7 @@ class TestNaughtyStrings(unittest.TestCase):
         for val in data:
             db.put(val, val)
         for val in data:
-            self.assertEqual(db.get_string(val).decode(), val)
+            self.assertEqual(db[val], val)
         db.stop()
 
 if __name__ == '__main__':
