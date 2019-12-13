@@ -69,6 +69,8 @@ class Database():
         return self.exists(key)
 
     def __delitem__(self, key):
+        if key not in self:
+            raise KeyError(key)
         self.remove(key)
 
     # Stops the running engine.
