@@ -57,10 +57,9 @@ class Database():
         self.put(key,value)
 
     def __getitem__(self, key):
-        item = self.get_string(key)
-        if not item:
+        if key not  in self:
             raise KeyError(key)
-        return item
+        return self.db.get_string(key)
 
     def __len__(self):
         return self.count_all()
