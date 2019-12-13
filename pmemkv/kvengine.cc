@@ -170,14 +170,14 @@ pmemkv_NI_members[] = {
 static PyObject *
 Pmemkv_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 	PmemkvObject *self = (PmemkvObject *) type->tp_alloc(type, 0);
-	if(self !=NULL) {
-		self->db = NULL;
-	}
 	return (PyObject *) self;
 }
 
 static int Pmemkv_init(PmemkvObject *self)
 {
+	if(self !=NULL) {
+		self->db = NULL;
+	}
 	return 0;
 }
 
