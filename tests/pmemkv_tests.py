@@ -51,8 +51,10 @@ class TestKVEngine(unittest.TestCase):
     def all_and_each(self, key = '', value = ''):
         if value != '':
             value_mem_view = memoryview(value)
+            key_mem_view = memoryview(key)
             value_text_representation = value_mem_view.tobytes().decode('utf-8')
-            self.key_and_value += self.formatter.format(key,
+            key_text_representation = key_mem_view.tobytes().decode('utf-8')
+            self.key_and_value += self.formatter.format(key_text_representation,
                               value_text_representation)
         else:
             self.key += self.formatter.format(key)

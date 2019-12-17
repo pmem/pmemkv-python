@@ -254,16 +254,20 @@ key_callback(const char* key, size_t keybytes, const char* value, size_t valueby
 
 int
 key_value_callback(const char* key, size_t keybytes, const char* value, size_t valuebyte, void* context) {
-	PmemkvValueBufferObject *entry = PyObject_New(PmemkvValueBufferObject, &PmemkvValueBufferType);
-	if(entry) {
-		entry->value = value;
-		entry->length = valuebyte;
+	PmemkvValueBufferObject *value_buffer = PyObject_New(PmemkvValueBufferObject, &PmemkvValueBufferType);
+	PmemkvValueBufferObject *key_buffer = PyObject_New(PmemkvValueBufferObject, &PmemkvValueBufferType);
+	if(value_buffer) {
+		value_buffer->value = value;
+		value_buffer->length = valuebyte;
 	}
-	PyObject* key_obj = Py_BuildValue("s#", key, keybytes);
+	if(key_buffer) {
+		key_buffer->value = key;
+		key_buffer->length = keybytes;
+	}
 	PyObject *args = PyTuple_New(2);
-	if (PyTuple_SetItem(args, 0, key_obj) != 0)
+	if (PyTuple_SetItem(args, 0, (PyObject *)key_buffer) != 0)
 		return 0;
-	if (PyTuple_SetItem(args, 1, (PyObject *)entry) != 0)
+	if (PyTuple_SetItem(args, 1, (PyObject *)value_buffer) != 0)
 		return 0;
 	PyObject *res = PyObject_CallObject((PyObject *) context, args);
 	Py_DECREF(args);
