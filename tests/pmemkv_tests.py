@@ -194,6 +194,17 @@ class TestKVEngine(unittest.TestCase):
         self.assertEqual(db.get(r"key1"), None)
         db.stop()
 
+    def test_exceptions_hierarchy(self):
+        exceptions = [pmemkv.Error, pmemkv.UnknownError, pmemkv.NotSupported,
+                  pmemkv.InvalidArgument, pmemkv.ConfigParsingError,
+                  pmemkv.ConfigTypeError, pmemkv.StoppedByCallback,
+                  pmemkv.WrongEngineName, pmemkv.TransactionScopeError]
+        with self.assertRaises(Exception):
+            raise(pmemkv.Error)
+        for ex in exceptions:
+            with self.assertRaises(pmemkv.Error):
+                raise(ex)
+
     def test_throws_exception_on_start_when_config_is_empty(self):
         db = None
         try:
