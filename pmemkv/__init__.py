@@ -31,3 +31,14 @@
 '''
 
 from pmemkv.pmemkv import Database
+from _pmemkv import (
+    Error,
+    UnknownError,
+    NotSupported,
+    InvalidArgument,
+    ConfigParsingError,
+    ConfigTypeError,
+    StoppedByCallback,
+    WrongEngineName,
+    TransactionScopeError,
+)
