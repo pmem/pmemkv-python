@@ -37,11 +37,33 @@
 #include <libpmemkv.h>
 #include <libpmemkv_json_config.h>
 #include <iostream>
+#include <unordered_map>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+static PyObject *PmemkvException;
+
+typedef struct {
+	PyObject *exception;
+	const char *object_name;
+	const char *exception_name;
+}Exception;
+
+static std::unordered_map<int, Exception> ExceptionDispatcher = {
+	{ PMEMKV_STATUS_UNKNOWN_ERROR, Exception{NULL, "UnknownError","pmemkv_NI.UnknownError"}},
+	{ PMEMKV_STATUS_NOT_FOUND, Exception{PyExc_KeyError, NULL ,NULL}},
+	{ PMEMKV_STATUS_NOT_SUPPORTED, Exception{NULL, "NotSupported", "pmemkv_NI.NotSupported"}},
+	{ PMEMKV_STATUS_INVALID_ARGUMENT, Exception{NULL, "InvalidArgument", "pmemkv_NI.InvalidArgument"}},
+	{ PMEMKV_STATUS_CONFIG_PARSING_ERROR,  Exception{NULL, "ConfigParsingError", "pmemkv_NI.ConfigParsingError"}},
+	{ PMEMKV_STATUS_CONFIG_TYPE_ERROR,  Exception{NULL, "ConfigTypeError", "pmemkv_NI.ConfigTypeError"}},
+	{ PMEMKV_STATUS_STOPPED_BY_CB,  Exception{NULL, "StoppedByCallback", "pmemkv_NI.StoppedByCallback"}},
+	{ PMEMKV_STATUS_OUT_OF_MEMORY,  Exception{PyExc_MemoryError, NULL, NULL}},
+	{ PMEMKV_STATUS_WRONG_ENGINE_NAME,  Exception{NULL, "WrongEngineName", "pmemkv_NI.WrongEngineName"}},
+	{ PMEMKV_STATUS_TRANSACTION_SCOPE_ERROR,  Exception{NULL, "TransactionScopeError", "pmemkv_NI.TransactionScopeError"}}
+};
 
 typedef struct {
 	PyObject_HEAD
@@ -192,7 +214,7 @@ pmemkv_NI_Start(PmemkvObject *self, PyObject* args) {
 	pmemkv_config *config = pmemkv_config_new();
 	if (config == nullptr) {
 		// "Allocating a new pmemkv config failed"
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(PMEMKV_STATUS_OUT_OF_MEMORY));
+		PyErr_SetString(PmemkvException, pmemkv_errormsg());
 		return NULL;
 	}
 
@@ -200,14 +222,14 @@ pmemkv_NI_Start(PmemkvObject *self, PyObject* args) {
 	if (rv != PMEMKV_STATUS_OK) {
 		pmemkv_config_delete(config);
 		// "Creating a pmemkv config from JSON string failed"
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(rv));
+		PyErr_SetString(ExceptionDispatcher[rv].exception, pmemkv_config_from_json_errormsg());
 		return NULL;
 	}
 
 	rv = pmemkv_open((const char*) engine.buf, config, &self->db);
 	if (rv != PMEMKV_STATUS_OK) {
 		// "pmemkv_open failed"
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(rv));
+		PyErr_SetString(ExceptionDispatcher[rv].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	Py_RETURN_NONE;
@@ -295,7 +317,7 @@ pmemkv_NI_GetKeys(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -312,7 +334,7 @@ pmemkv_NI_GetKeysAbove(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -329,7 +351,7 @@ pmemkv_NI_GetKeysBelow(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -346,7 +368,7 @@ pmemkv_NI_GetKeysBetween(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -358,7 +380,7 @@ pmemkv_NI_CountAll(PmemkvObject *self) {
 	size_t cnt;
 	int result = pmemkv_count_all(self->db, &cnt);
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return Py_BuildValue("i", cnt);
@@ -373,7 +395,7 @@ pmemkv_NI_CountAbove(PmemkvObject *self, PyObject* args) {
 	size_t cnt;
 	int result = pmemkv_count_above(self->db, (const char*) key.buf, key.len, &cnt);
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return Py_BuildValue("i", cnt);
@@ -388,7 +410,7 @@ pmemkv_NI_CountBelow(PmemkvObject *self, PyObject* args) {
 	size_t cnt;
 	int result = pmemkv_count_below(self->db, (const char*) key.buf, key.len, &cnt);
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return Py_BuildValue("i", cnt);
@@ -403,7 +425,7 @@ pmemkv_NI_CountBetween(PmemkvObject *self, PyObject* args) {
 	size_t cnt;
 	int result = pmemkv_count_between(self->db, (const char*) key1.buf, key1.len, (const char*) key2.buf, key2.len, &cnt);
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return Py_BuildValue("i", cnt);
@@ -420,7 +442,7 @@ pmemkv_NI_GetAll(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -437,7 +459,7 @@ pmemkv_NI_GetAbove(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -454,7 +476,7 @@ pmemkv_NI_GetBelow(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -471,7 +493,7 @@ pmemkv_NI_GetBetween(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -486,7 +508,7 @@ pmemkv_NI_Exists(PmemkvObject *self, PyObject* args) {
 	}
 	int result = pmemkv_exists(self->db, (const char*) key.buf, key.len);
 	if (result != PMEMKV_STATUS_OK && result != PMEMKV_STATUS_NOT_FOUND) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result == PMEMKV_STATUS_OK);
@@ -501,7 +523,7 @@ pmemkv_NI_Put(PmemkvObject *self, PyObject* args) {
 	}
 	int result = pmemkv_put(self->db, (const char*) key.buf, key.len, (const char*) value.buf, value.len);
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -527,8 +549,8 @@ pmemkv_NI_GetString(PmemkvObject *self, PyObject* args) {
 	int result = pmemkv_get(self->db, (const char*) key.buf, key.len, callback, &cxt);
 	if(PyErr_Occurred() != NULL)
 		return NULL;
-	if (result != PMEMKV_STATUS_OK && result != PMEMKV_STATUS_NOT_FOUND) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+	if (result != PMEMKV_STATUS_OK) {
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	} else if (cxt.status == PMEMKV_STATUS_OK) {
 		return Py_BuildValue("s#", cxt.value.data(), cxt.value.size());
@@ -548,7 +570,7 @@ pmemkv_NI_Get(PmemkvObject *self, PyObject* args) {
 	if(PyErr_Occurred() != NULL)
 		return NULL;
 	if (result != PMEMKV_STATUS_OK) {
-		PyErr_SetString(PyExc_Exception, pmemkv_errormsg());
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result);
@@ -562,7 +584,7 @@ pmemkv_NI_Remove(PmemkvObject *self, PyObject* args) {
 	}
 	int result = pmemkv_remove(self->db, (const char*) key.buf, key.len);
 	if (result != PMEMKV_STATUS_OK && result != PMEMKV_STATUS_NOT_FOUND) {
-		PyErr_SetObject(PyExc_Exception, PyLong_FromLong(result));
+		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
 	return PyLong_FromLong(result == PMEMKV_STATUS_OK);
@@ -661,14 +683,37 @@ PyInit__pmemkv(void) {
 	m = PyModule_Create(&pmemkv_NI_module);
 	if (m == NULL)
 		return NULL;
-
-	Py_INCREF(&PmemkvType);
-	if (PyModule_AddObject(m, "pmemkv_NI", (PyObject *) &PmemkvType) < 0) {
-	        Py_DECREF(&PmemkvType);
-		Py_DECREF(m);
+	
+	try {
+		Py_INCREF(&PmemkvType);
+		if (PyModule_AddObject(m, "pmemkv_NI", (PyObject *) &PmemkvType) < 0) {
+			throw;
+		}
+		PmemkvException = PyErr_NewException("pmemkv_NI.PmemkvException", NULL, NULL);
+		if (PyModule_AddObject(m, "Error", PmemkvException) < 0) {
+			throw;
+		}
+		for (auto &e : ExceptionDispatcher) {
+			if(e.second.exception == NULL){
+				e.second.exception = PyErr_NewException(e.second.exception_name,
+						 PmemkvException, NULL);
+				if (PyModule_AddObject(m, e.second.object_name, e.second.exception) < 0) {
+					throw;
+				}
+			}
+		}
+	}
+	catch(...) {
+		Py_XDECREF(&PmemkvType);
+		Py_XDECREF(m);
+		Py_XDECREF(PmemkvException);
+		Py_XDECREF(m);
+		for (auto &e : ExceptionDispatcher) {
+			Py_XDECREF(e.second.exception);
+			Py_XDECREF(m);
+		}
 		return NULL;
 	}
-
 	return m;
 }
 
