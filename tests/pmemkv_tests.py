@@ -32,10 +32,9 @@
 
 import unittest
 
-from pmemkv.pmemkv import Database,\
-    PMEMKV_STATUS_INVALID_ARGUMENT, \
-    PMEMKV_STATUS_CONFIG_PARSING_ERROR, \
-    PMEMKV_STATUS_WRONG_ENGINE_NAME
+from pmemkv import Database
+import pmemkv
+
 
 class TestKVEngine(unittest.TestCase):
 
