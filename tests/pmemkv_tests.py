@@ -503,6 +503,17 @@ class TestKVEngine(unittest.TestCase):
             assert type(e).__name__ == "AttributeError"
         db.stop()
 
+    def test_get_lambda_in_callback(self):
+        key = "dict_test"
+        val = "123"
+        db = Database(self.engine, self.config)
+        db[key] = val
+
+        db.get(key, lambda v, k=key: self.assertEqual(memoryview(v).tobytes(),
+                                             "123".encode('utf-8')))
+        db.get(key, lambda v, k=key: self.assertEqual(k, "dict_test"))
+        db.stop()
+
     def test_dict_len(self):
         db = Database(self.engine, self.config)
         db['dict_test'] = "123"
