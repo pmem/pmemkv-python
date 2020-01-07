@@ -503,6 +503,17 @@ class TestKVEngine(unittest.TestCase):
             assert type(e).__name__ == "AttributeError"
         db.stop()
 
+    def test_get_out_of_bound_access_in_callback(self):
+        key = "dict_test"
+        val = "123"
+        db = Database(self.engine, self.config)
+        db[key] = val
+        with self.assertRaises(IndexError):
+            db.get(key, lambda v: memoryview(v).tobytes()[4])
+        with self.assertRaises(TypeError):
+            db.get(key, lambda v: memoryview(v)[1])
+        db.stop()
+
     def test_get_lambda_in_callback(self):
         key = "dict_test"
         val = "123"
