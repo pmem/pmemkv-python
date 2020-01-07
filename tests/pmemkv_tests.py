@@ -508,5 +508,14 @@ class TestKVEngine(unittest.TestCase):
         db1.stop()
         db2.stop()
 
+
+    def test_delete_same_element_two_times(self):
+        db = Database(self.engine, self.config)
+        db['dict_test'] = "123"
+        del db['dict_test']
+        with self.assertRaises(KeyError):
+            del db['dict_test']
+        db.stop()
+
 if __name__ == '__main__':
     unittest.main()
