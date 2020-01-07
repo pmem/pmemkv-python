@@ -35,10 +35,7 @@ import json
 import urllib.request
 import os.path
 
-from pmemkv.pmemkv import Database,\
-    PMEMKV_STATUS_INVALID_ARGUMENT, \
-    PMEMKV_STATUS_CONFIG_PARSING_ERROR, \
-    PMEMKV_STATUS_WRONG_ENGINE_NAME
+import pmemkv
 
 class TestNaughtyStrings(unittest.TestCase):
 
@@ -58,14 +55,14 @@ class TestNaughtyStrings(unittest.TestCase):
         return data
 
     def test_puts_tricky_keys_and_values(self):
-        db = Database(self.engine, self.config)
+        db = pmemkv.Database(self.engine, self.config)
         data = {}
         with open("blns.json") as f:
             data = json.load(f)
         for val in data:
             db.put(val, val)
         for val in data:
-            self.assertEqual(db.get_string(val).decode(), val)
+            self.assertEqual(db[val], val)
         db.stop()
 
 if __name__ == '__main__':
