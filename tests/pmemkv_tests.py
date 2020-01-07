@@ -68,14 +68,17 @@ class TestKVEngine(unittest.TestCase):
         db = Database(r"blackhole", self.config)
         self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get_string(r"key1"), None)
+        with self.assertRaises(KeyError):
+            db.get_string(r"key1")
         db.put(r"key1", r"value123")
         self.assertEqual(db.count_all(), 0)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get_string(r"key1"), None)
+        with self.assertRaises(KeyError):
+            db.get_string(r"key1")
         self.assertTrue(db.remove(r"key1"))
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get_string(r"key1"), None)
+        with self.assertRaises(KeyError):
+            db.get_string(r"key1")
         db.stop()
 
     def test_stop_engine_multiple_times(self):
@@ -91,7 +94,8 @@ class TestKVEngine(unittest.TestCase):
     def test_gets_missing_key(self):
         db = Database(self.engine, self.config)
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get_string(r"key1"), None)
+        with self.assertRaises(KeyError):
+            db.get_string(r"key1")
         db.stop()
 
     def test_puts_basic_values(self):
@@ -191,7 +195,8 @@ class TestKVEngine(unittest.TestCase):
         self.assertTrue(db.remove(r"key1"))
         self.assertFalse(db.remove(r"key1"))
         self.assertFalse(db.exists(r"key1"))
-        self.assertEqual(db.get_string(r"key1"), None)
+        with self.assertRaises(KeyError):
+            db.get_string(r"key1")
         db.stop()
 
     def test_exceptions_hierarchy(self):
@@ -207,52 +212,48 @@ class TestKVEngine(unittest.TestCase):
 
     def test_throws_exception_on_start_when_config_is_empty(self):
         db = None
-        try:
+        with self.assertRaises(pmemkv.Error):
             db = Database(self.engine, "{}")
-            self.assertFalse(True)
-        except Exception as e:
-            # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_INVALID_ARGUMENT)
-        self.assertEqual(db, None)
+        """ InvalidArgument is for consistency with pmemkv interface
+        reference in pmemkv test: basic_tests/PmemkvCApiTest.NullConfig
+        """
+        with self.assertRaises(pmemkv.InvalidArgument):
+            db = Database(self.engine, "{}")
+
 
     def test_exception_on_start_when_config_is_malformed(self):
         db = None
-        try:
+        with self.assertRaises(pmemkv.Error):
             db = Database(self.engine, "{")
-            self.assertFalse(True)
-        except Exception as e:
-            # "Creating a pmemkv config from JSON string failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_CONFIG_PARSING_ERROR)
+        with self.assertRaises(pmemkv.ConfigParsingError):
+            db = Database(self.engine, "{")
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_engine_is_invalid(self):
         db = None
-        try:
+        with self.assertRaises(pmemkv.Error):
             db = Database(r"nope.nope", self.config)
-            self.assertFalse(True)
-        except Exception as e:
-            # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_WRONG_ENGINE_NAME)
+        with self.assertRaises(pmemkv.WrongEngineName):
+            db = Database(r"nope.nope", self.config)
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_path_is_invalid(self):
         db = None
-        try:
-            db = Database(self.engine, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\"}")
-            self.assertFalse(True)
-        except Exception as e:
-            # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_INVALID_ARGUMENT)
+        with self.assertRaises(pmemkv.Error):
+            db = Database(self.engine, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\", \"size\": 1073741824}")
+        """ This part need to be commented out due to pmemkv issue
+            https://github.com/pmem/pmemkv/issues/565
+        with self.assertRaises(pmemkv.InvalidArgument):
+            db = Database(self.engine, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\", \"size\": 1073741824}")
+        """
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_path_is_wrong_type(self):
         db = None
-        try:
-            db = Database(self.engine, '{"path":1234}')
-            self.assertFalse(True)
-        except Exception as e:
-            # "pmemkv_open failed"
-            self.assertEqual(e.args[0], PMEMKV_STATUS_INVALID_ARGUMENT)
+        with self.assertRaises(pmemkv.Error):
+            db = Database(self.engine, '{\"path\":1234, \"size\": 1073741824}')
+        with self.assertRaises(pmemkv.ConfigTypeError):
+            db = Database(self.engine, '{\"path\":1234, \"size\": 1073741824}')
         self.assertEqual(db, None)
 
     def test_uses_get_keys(self):
