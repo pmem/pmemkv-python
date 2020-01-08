@@ -1,4 +1,5 @@
 import pmemkv
+import json
 
 
 def callback(key):
@@ -6,8 +7,12 @@ def callback(key):
     print(mem_view.tobytes().decode())
 
 
+config = None
+with open("vsmap_conf.json") as f:
+    config = json.load(f)
+
 print("Starting engine")
-db = pmemkv.Database(r"vsmap", '{"path":"/dev/shm","size":1073741824}')
+db = pmemkv.Database("vsmap", config)
 print("Put new key")
 db.put("key1", "value1")
 assert db.count_all() == 1

@@ -1,5 +1,5 @@
 '''
- * Copyright 2019, Intel Corporation
+ * Copyright 2019-2020, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,7 +42,7 @@ class TestNaughtyStrings(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.engine = r"vsmap"
-        self.config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
+        self.config = {"path":"/dev/shm","size":1073741824}
         self.strings = self._get_naughty_strings("https://raw.githubusercontent.com/minimaxir/big-list-of-naughty-strings/master/blns.json")
 
     def _get_naughty_strings(self, url):

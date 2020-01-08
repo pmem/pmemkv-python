@@ -1,4 +1,4 @@
-#  Copyright 2019, Intel Corporation
+#  Copyright 2019-2020, Intel Corporation
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -31,13 +31,16 @@
 """ Python bindings for pmemkv """
 
 import _pmemkv
+import json
 
 class Database():
 
-
     def __init__(self, engine, config):
+        if not isinstance(config, dict):
+            raise TypeError("Config shuld be dictionary")
+        self.config = json.dumps(config)
         self.db = _pmemkv.pmemkv_NI()
-        self.db.start(engine, config)
+        self.db.start(engine, self.config)
 
     def __setitem__(self, key, value):
         self.put(key,value)
