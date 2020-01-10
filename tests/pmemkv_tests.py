@@ -1,5 +1,5 @@
 '''
- * Copyright 2019, Intel Corporation
+ * Copyright 2019-2020, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -571,6 +571,21 @@ class TestKVEngine(unittest.TestCase):
         del db['dict_test']
         with self.assertRaises(KeyError):
             del db['dict_test']
+        db.stop()
+
+    def test_call_del_inside_callback(self):
+        def callback(val):
+            del(val)
+            # check if buffer protocol object was properly removed
+            with self.assertRaises(UnboundLocalError):
+                del(val)
+        key = "dict_test"
+        val = "123"
+        db = Database(self.engine, self.config)
+        db[key] = val
+        db.get(key, callback)
+        # check if key is accessable
+        self.assertEqual(db[key], val)
         db.stop()
 
 if __name__ == '__main__':
