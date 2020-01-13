@@ -64,31 +64,31 @@ class Database():
 
     def put(self, key, value):
         """ Inserts the key/value pair into pmemkv datastore. """
-        return self.db.put(key, value)
+        self.db.put(key, value)
 
     def get_keys(self, func):
         """ Executes callback function for every key stored in
         pmemkv datastore.
         """
-        return self.db.get_keys(func)
+        self.db.get_keys(func)
 
     def get_keys_above(self, key, func):
         """ Executes callback function for every key stored in
         pmemkv datastore, whose keys are greater than the given key.
         """
-        return self.db.get_keys_above(key, func)
+        self.db.get_keys_above(key, func)
 
     def get_keys_below(self, key, func):
         """ Executes callback function for every key stored in
         pmemkv datastore, whose keys are lower than the given key.
         """
-        return self.db.get_keys_below(key, func)
+        self.db.get_keys_below(key, func)
 
     def get_keys_between(self, key1, key2, func):
         """ Executes callback function for every key stored in pmemkv
         datastore, whose keys are greater than the key1 and less than the key2.
         """
-        return self.db.get_keys_between(key1, key2, func)
+        self.db.get_keys_between(key1, key2, func)
 
     def count_all(self):
         """ Returns number of currently stored elements in pmemkv datastore."""
@@ -119,27 +119,27 @@ class Database():
         """ Executes callback function for every record stored in pmemkv
         datastore.
         """
-        return self.db.get_all(func)
+        self.db.get_all(func)
 
     def get_above(self, key, func):
         """ Executes callback function for every key/value pair stored in
         pmemkv datastore, whose keys are greater than the given key.
         """
-        return self.db.get_above(key, func)
+        self.db.get_above(key, func)
 
 
     def get_below(self, key, func):
         """ Executes callback function for every key/value pair stored in
         pmemkv datastore, whose keys are lower than the given key.
         """
-        return self.db.get_below(key, func)
+        self.db.get_below(key, func)
 
     def get_between(self, key1, key2, func):
         """ Executes callback function for every key/value pair stored in
         pmemkv datastore, whose keys are greater than the key1 and less
         than the key2.
         """
-        return self.db.get_between(key1, key2, func)
+        self.db.get_between(key1, key2, func)
 
     def exists(self, key):
         """ Verifies the key presence in pmemkv datastore."""
@@ -147,7 +147,7 @@ class Database():
 
     def get(self, key, func):
         """ Executes callback function for value for given key. """
-        return self.db.get(key, func)
+        self.db.get(key, func)
 
     def get_string(self, key):
         """ Gets copy (as a string) of value for given key """
