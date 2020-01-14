@@ -37,11 +37,12 @@ def callback(key):
     print(mem_view.tobytes().decode())
 
 
+print("Loading config from json file")
 config = None
 with open("vsmap_conf.json") as f:
     config = json.load(f)
 
-print("Starting engine")
+print(f"Starting engine with config: {config}")
 db = pmemkv.Database("vsmap", config)
 print("Put new key")
 db.put("key1", "value1")
@@ -70,6 +71,23 @@ db.get(
 print("Removing existing key")
 db.remove("key1")
 assert not db.exists("key1")
+
+print("Stopping engine")
+db.stop()
+
+print("Configuring engine")
+config = {}
+config["path"] = "/dev/shm"
+config["size"] = 1073741824
+
+print(f"Starting engine with config: {config}")
+db = pmemkv.Database("vsmap", config)
+
+print("Put new key")
+db.put("key1", "value1")
+
+print("Get single value")
+db.get("key1", callback)
 
 print("Stopping engine")
 db.stop()
