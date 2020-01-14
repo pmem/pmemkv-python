@@ -41,7 +41,7 @@ class TestKVEngine(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.engine = r"vsmap"
-        self.config = "{\"path\":\"/dev/shm\",\"size\":1073741824}"
+        self.config = {"path":"/dev/shm", "size":1073741824}
         self.key_and_value = r""
         self.formatter = r"{},"
 
@@ -213,20 +213,18 @@ class TestKVEngine(unittest.TestCase):
     def test_throws_exception_on_start_when_config_is_empty(self):
         db = None
         with self.assertRaises(pmemkv.Error):
-            db = Database(self.engine, "{}")
+            db = Database(self.engine, {})
         """ InvalidArgument is for consistency with pmemkv interface
         reference in pmemkv test: basic_tests/PmemkvCApiTest.NullConfig
         """
         with self.assertRaises(pmemkv.InvalidArgument):
-            db = Database(self.engine, "{}")
+            db = Database(self.engine, {})
 
 
-    def test_exception_on_start_when_config_is_malformed(self):
+    def test_exception_on_start_when_config_is_wrong_type(self):
         db = None
-        with self.assertRaises(pmemkv.Error):
-            db = Database(self.engine, "{")
-        with self.assertRaises(pmemkv.ConfigParsingError):
-            db = Database(self.engine, "{")
+        with self.assertRaises(TypeError):
+            db = Database(self.engine, "{}")
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_engine_is_invalid(self):
@@ -240,20 +238,20 @@ class TestKVEngine(unittest.TestCase):
     def test_throws_exception_on_start_when_path_is_invalid(self):
         db = None
         with self.assertRaises(pmemkv.Error):
-            db = Database(self.engine, r'{"path":"/tmp/123/234/345/456/567/678/nope.nope\", "size": 1073741824}')
+            db = Database(self.engine, {"path":"/tmp/123/234/345/456/567/678/nope.nope", "size": 1073741824})
         """ This part need to be commented out due to pmemkv issue
             https://github.com/pmem/pmemkv/issues/565
         with self.assertRaises(pmemkv.InvalidArgument):
-            db = Database(self.engine, r'{"path":"/tmp/123/234/345/456/567/678/nope.nope", "size": 1073741824}')
+            db = Database(self.engine, {"path":"/tmp/123/234/345/456/567/678/nope.nope", "size": 1073741824})
         """
         self.assertEqual(db, None)
 
     def test_throws_exception_on_start_when_path_is_wrong_type(self):
         db = None
         with self.assertRaises(pmemkv.Error):
-            db = Database(self.engine, r'{"path":1234, "size": 1073741824}')
+            db = Database(self.engine, {"path":1234, "size": 1073741824})
         with self.assertRaises(pmemkv.ConfigTypeError):
-            db = Database(self.engine, r'{"path":1234, "size": 1073741824}')
+            db = Database(self.engine, {"path":1234, "size": 1073741824})
         self.assertEqual(db, None)
 
     def test_uses_get_keys(self):
