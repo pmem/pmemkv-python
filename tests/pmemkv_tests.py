@@ -588,5 +588,28 @@ class TestKVEngine(unittest.TestCase):
         self.assertEqual(db[key], val)
         db.stop()
 
+    def test_context_manager(self):
+        key = "dict_test"
+        val = "123"
+        with Database(self.engine, self.config) as db:
+            db[key] = val
+            self.assertEqual(db[key], val)
+
+    def test_throws_exception_in_context_manager(self):
+        class TestException(Exception):
+            pass
+        def callback(val):
+            raise TestException()
+        key = "dict_test"
+        val = "123"
+        with Database(self.engine, self.config) as db:
+            db[key] = val
+            with self.assertRaises(TestException):
+                db.get(key, callback)
+        with self.assertRaises(TestException):
+            with Database(self.engine, self.config) as db:
+                db[key] = val
+                db.get(key, callback)
+
 if __name__ == '__main__':
     unittest.main()

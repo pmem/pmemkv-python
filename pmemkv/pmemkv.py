@@ -58,6 +58,12 @@ class Database():
             raise KeyError(key)
         self.remove(key)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        self.stop()
+
     def stop(self):
         """ Stops the running engine."""
         self.db.stop()
