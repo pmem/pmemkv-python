@@ -49,27 +49,40 @@ typedef struct {
 	PyObject *exception;
 	const char *object_name;
 	const char *exception_name;
+	const char *docstring;
 } Exception;
 
 static std::unordered_map<int, Exception> ExceptionDispatcher = {
 	{PMEMKV_STATUS_UNKNOWN_ERROR,
-	 Exception{NULL, "UnknownError", "pmemkv_NI.UnknownError"}},
-	{PMEMKV_STATUS_NOT_FOUND, Exception{PyExc_KeyError, NULL, NULL}},
+	 Exception{NULL, "UnknownError", "pmemkv_NI.UnknownError",
+		   "Something unexpected went wrong"}},
+	{PMEMKV_STATUS_NOT_FOUND,
+	 Exception{PyExc_KeyError, NULL, NULL, "Record (or config item) not found"}},
 	{PMEMKV_STATUS_NOT_SUPPORTED,
-	 Exception{NULL, "NotSupported", "pmemkv_NI.NotSupported"}},
+	 Exception{NULL, "NotSupported","pmemkv_NI.NotSupported",
+		   "Function is not implemented by current engine"}},
 	{PMEMKV_STATUS_INVALID_ARGUMENT,
-	 Exception{NULL, "InvalidArgument", "pmemkv_NI.InvalidArgument"}},
+	 Exception{NULL, "InvalidArgument", "pmemkv_NI.InvalidArgument",
+		   "Argument to function has wrong value"}},
 	{PMEMKV_STATUS_CONFIG_PARSING_ERROR,
-	 Exception{NULL, "ConfigParsingError", "pmemkv_NI.ConfigParsingError"}},
+	 Exception{NULL, "ConfigParsingError", "pmemkv_NI.ConfigParsingError",
+		   "Processing config failed"}},
 	{PMEMKV_STATUS_CONFIG_TYPE_ERROR,
-	 Exception{NULL, "ConfigTypeError", "pmemkv_NI.ConfigTypeError"}},
+	 Exception{NULL, "ConfigTypeError", "pmemkv_NI.ConfigTypeError",
+		   "Config item has different type than expected"}},
 	{PMEMKV_STATUS_STOPPED_BY_CB,
-	 Exception{NULL, "StoppedByCallback", "pmemkv_NI.StoppedByCallback"}},
-	{PMEMKV_STATUS_OUT_OF_MEMORY, Exception{PyExc_MemoryError, NULL, NULL}},
+	 Exception{NULL, "StoppedByCallback", "pmemkv_NI.StoppedByCallback",
+		   "Callback function aborted in unexpected way"}},
+	{PMEMKV_STATUS_OUT_OF_MEMORY,
+	 Exception{
+		 PyExc_MemoryError, NULL, NULL,
+		 "Operation failed because there is not enough memory (or space on the device)"}},
 	{PMEMKV_STATUS_WRONG_ENGINE_NAME,
-	 Exception{NULL, "WrongEngineName", "pmemkv_NI.WrongEngineName"}},
+	 Exception{NULL, "WrongEngineName", "pmemkv_NI.WrongEngineName",
+		   "Engine name does not match any available engine"}},
 	{PMEMKV_STATUS_TRANSACTION_SCOPE_ERROR,
-	 Exception{NULL, "TransactionScopeError", "pmemkv_NI.TransactionScopeError"}}};
+	 Exception{NULL, "TransactionScopeError", "pmemkv_NI.TransactionScopeError",
+		   "An error with the scope of the libpmemobj transaction"}}};
 
 typedef struct {
 	PyObject_HEAD
@@ -717,8 +730,9 @@ PyInit__pmemkv(void) {
 		}
 		for (auto &e : ExceptionDispatcher) {
 			if (e.second.exception == NULL) {
-				e.second.exception = PyErr_NewException(
-					e.second.exception_name, PmemkvException, NULL);
+				e.second.exception = PyErr_NewExceptionWithDoc(
+					e.second.exception_name, e.second.docstring,
+					PmemkvException, NULL);
 				if (PyModule_AddObject(m, e.second.object_name,
 						       e.second.exception) < 0) {
 					throw;
