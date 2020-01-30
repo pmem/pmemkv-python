@@ -63,7 +63,11 @@ python3 -X faulthandler -m pytest -v  nontrivial_data_tests.py
 
 echo
 echo "##########################################################"
-echo "### Checking an example"
+echo "### Checking examples"
 echo "##########################################################"
 cd $WORKDIR/examples
 PMEM_IS_PMEM_FORCE=1 python3 basic_example.py
+
+REST_API_EXAMPLE_DIR="${WORKDIR}/examples/restAPI"
+APP_DIR=${REST_API_EXAMPLE_DIR} sh ${REST_API_EXAMPLE_DIR}/run_example.sh
+
