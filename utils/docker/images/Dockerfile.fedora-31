@@ -73,9 +73,13 @@ RUN dnf update -y \
 	wget \
 	which \
 	python3-pip \
+	procps \
 && dnf clean all
 
+#Install build dependencies
 RUN pip3 install pytest setuptools wheel
+#Install examples dependencies
+RUN pip3 install falcon gunicorn
 # Install glibc-debuginfo
 RUN dnf debuginfo-install -y glibc
 
