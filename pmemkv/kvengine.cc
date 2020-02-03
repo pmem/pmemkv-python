@@ -533,7 +533,7 @@ pmemkv_NI_Exists(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result == PMEMKV_STATUS_OK);
+	return PyBool_FromLong(result == PMEMKV_STATUS_OK);
 }
 
 // "CRUD" Operations.
@@ -609,7 +609,7 @@ pmemkv_NI_Remove(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result == PMEMKV_STATUS_OK);
+	return PyBool_FromLong(result == PMEMKV_STATUS_OK);
 }
 
 // Functions declarations.
