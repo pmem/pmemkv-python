@@ -270,6 +270,8 @@ void value_callback(const char *value, size_t valuebyte, void *context)
 				Py_XDECREF(res);
 			}
 		}
+		entry->value = NULL;
+		entry->length = 0;
 		Py_XDECREF(args);
 	} else {
 		PyErr_SetString(PyExc_MemoryError,
@@ -311,6 +313,11 @@ int key_value_callback(const char *key, size_t keybytes, const char *value,
 		retval = -1;
 	}
 	PyObject *res = PyObject_CallObject((PyObject *)context, args);
+	key_buffer->value=NULL;
+	key_buffer->length=0;
+	value_buffer->value=NULL;
+	value_buffer->length=0;
+
 	Py_DECREF(value_buffer);
 	Py_DECREF(key_buffer);
 	Py_DECREF(args);
