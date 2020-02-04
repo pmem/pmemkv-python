@@ -47,10 +47,10 @@ class TestKVEngine(unittest.TestCase):
 
 
     def all_and_each(self, key = b'', value = b''):
-        value_mem_view = memoryview(value)
-        key_mem_view = memoryview(key)
-        value_text_representation = value_mem_view.tobytes().decode('utf-8')
-        key_text_representation = key_mem_view.tobytes().decode('utf-8')
+        value_copy = bytes(value)
+        key_copy = bytes(key)
+        value_text_representation = value_copy.decode('utf-8')
+        key_text_representation = key_copy.decode('utf-8')
         self.key_and_value += self.formatter.format(key_text_representation,
                               value_text_representation)
 
@@ -452,14 +452,16 @@ class TestKVEngine(unittest.TestCase):
             def __init__(self):
                 self.result = None
             def __call__(self, key):
-                self.result = memoryview(key)
+                self.result = bytes(key)
         callback = Callback()
         db = Database(self.engine, self.config)
         key = "dict_test"
         val = "123"
         db[key] = val
         db.get(key, callback)
-        self.assertEqual(callback.result.tobytes(), "123".encode('utf-8'))
+        db.remove(key)
+        db[key] = "Some other string"
+        self.assertEqual(callback.result, "123".encode('utf-8'))
         db.stop()
 
     def test_get_assert_in_callback(self):
