@@ -43,6 +43,8 @@ PACKAGE_TYPE=$1
 current_pmemkv_version="6fbad66aaffa0387308de5beced6aa5fe30fff3b"
 # stable-1.0: Merge pull request #528 from ldorau/Do-not-add-pmemkv_config...; 14.11.2019
 stable_1_pmemkv_version="a3735b5393f0d5411ef8a2468b36d2a1ed00c0a1"
+# stable-1.1: Version 1.1
+stable_1_1_pmemkv_version="2f719305afb0f44103734851cfe825e1b1d73dbf"
 
 prepare_pmemkv () {
 	pmemkv_version="$1"
@@ -66,6 +68,7 @@ cd pmemkv
 
 prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
 prepare_pmemkv "$stable_1_pmemkv_version" "pmemkv-stable-1.0"
+prepare_pmemkv "$stable_1_pmemkv_version" "pmemkv-stable-1.1"
 
 cd ..
 rm -r pmemkv
