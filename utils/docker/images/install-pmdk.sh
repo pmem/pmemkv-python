@@ -39,8 +39,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# stable-1.7: Merge pull request #4097 from pmem/stable-1.6, 5.11.2019
-PMDK_VERSION="31cea307b2b7c0c0d0d209b8c5f47adc9d1353a0"
+# stable-1.8: common: fix build on GitHub Actions
+PMDK_VERSION="eeb8fd86c6c72f4607a22a1e9d9f7da31be8af2a"
 
 git clone https://github.com/pmem/pmdk --shallow-since=2019-09-26
 cd pmdk
@@ -53,10 +53,11 @@ else
 	if [ "$PACKAGE_TYPE" = "dpkg" ]; then
 		sudo dpkg -i dpkg/libpmem_*.deb dpkg/libpmem-dev_*.deb
 		sudo dpkg -i dpkg/libpmemobj_*.deb dpkg/libpmemobj-dev_*.deb
+		sudo dpkg -i dpkg/libpmemblk_*.deb dpkg/libpmemlog_*.deb dpkg/libpmempool_*.deb dpkg/pmempool_*.deb
 	elif [ "$PACKAGE_TYPE" = "rpm" ]; then
 		sudo rpm -i rpm/*/pmdk-debuginfo-*.rpm
-		sudo rpm -i rpm/*/libpmem-*.rpm
-		sudo rpm -i rpm/*/libpmemobj-*.rpm
+		sudo rpm -i rpm/*/libpmem*-*.rpm
+		sudo rpm -i rpm/*/pmempool-*.rpm
 	fi
 fi
 
