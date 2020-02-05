@@ -39,8 +39,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# stable-1.7: Merge pull request #4097 from pmem/stable-1.6, 5.11.2019
-PMDK_VERSION="31cea307b2b7c0c0d0d209b8c5f47adc9d1353a0"
+# stable-1.8: common: fix build on GitHub Actions
+PMDK_VERSION="eeb8fd86c6c72f4607a22a1e9d9f7da31be8af2a"
 
 git clone https://github.com/pmem/pmdk --shallow-since=2019-09-26
 cd pmdk
