@@ -39,8 +39,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Add [count|get]_[above|below] API support for stree engine (#523); 18.11.2019
-current_pmemkv_version="6fbad66aaffa0387308de5beced6aa5fe30fff3b"
+# master: Merge pull request #602 from ldorau/Fix-setting-compilers--do-not-mix-gcc-with-clang
+current_pmemkv_version="5aff9f197e2e3eaae7f419c04ab9e2fc98309eed"
 # stable-1.0: Merge pull request #528 from ldorau/Do-not-add-pmemkv_config...; 14.11.2019
 stable_1_pmemkv_version="a3735b5393f0d5411ef8a2468b36d2a1ed00c0a1"
 # stable-1.1: Version 1.1
