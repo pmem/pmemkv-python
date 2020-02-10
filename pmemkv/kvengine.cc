@@ -218,14 +218,6 @@ Pmemkv_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 	return (PyObject *) self;
 }
 
-static int Pmemkv_init(PmemkvObject *self)
-{
-	if (self != NULL) {
-		self->db = NULL;
-	}
-	return 0;
-}
-
 // Turn on/off operations.
 static PyObject *
 pmemkv_NI_Start(PmemkvObject *self, PyObject* args) {
@@ -700,7 +692,7 @@ static PyTypeObject PmemkvType = {
 	.tp_descr_get = 0,
 	.tp_descr_set = 0,
 	.tp_dictoffset = 0,
-	.tp_init = (initproc)Pmemkv_init,
+	.tp_init = 0,
 	.tp_alloc = 0,
 	.tp_new = Pmemkv_new,
 	.tp_free = 0,
