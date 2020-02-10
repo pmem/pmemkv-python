@@ -45,14 +45,15 @@ cd tests
 python3 -m pytest -v pmemkv_tests.py
 ```
 
-## Example
+## Examples
 
 We are using `/dev/shm` to
 [emulate persistent memory](http://pmem.io/2016/02/22/pm-emulation.html)
-in example.
+in examples.
 
-It can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-python/tree/master/examples).
-To execute the example:
+They can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-python/tree/master/examples).
+To execute examples:
 ```bash
 PMEM_IS_PMEM_FORCE=1 python3 basic_example.py
+PMEM_IS_PMEM_FORCE=1 python3 restAPI/run_example.py
 ```
