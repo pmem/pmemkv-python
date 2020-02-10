@@ -80,6 +80,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install pytest setuptools wheel
+#Install examples dependencies
+RUN pip3 install falcon pexpect requests
+
 # Install pmdk
 COPY install-pmdk.sh install-pmdk.sh
 RUN ./install-pmdk.sh dpkg
