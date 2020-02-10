@@ -139,6 +139,8 @@ static int PmemkvValueBuffer_init(PmemkvValueBufferObject *self)
 	if (self != NULL) {
 		self->value = NULL;
 		self->length = 0;
+	} else {
+		return -1;
 	}
 	return 0;
 }
