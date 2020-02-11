@@ -96,7 +96,7 @@ static int PmemkvValueBufferObject_getbuffer(PyObject *obj, Py_buffer *view, int
 	view->readonly = 1;
 	view->itemsize = 1;
 	view->format = 0; // unsigned bytes
-	view->ndim = 0;
+	view->ndim = 1;
 	view->shape = NULL;
 	view->strides = NULL;
 	view->suboffsets = NULL;
