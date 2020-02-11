@@ -1,27 +1,27 @@
-# pmemkv-python
-Python bindings for pmemkv
+[![Build Status](https://travis-ci.org/pmem/pmemkv-python.svg?branch=master)](https://travis-ci.org/pmem/pmemkv-python)
 
-*This is experimental pre-release software and should not be used in
-production systems. APIs and file formats may change at any time without
-preserving backwards compatibility. All known issues and limitations
-are logged as GitHub issues.*
+# pmemkv-python
+Python bindings for pmemkv.
+
+All known issues and limitations are logged as GitHub issues.
 
 ## Dependencies
 
 * Python 3.6 or later
 	* along with python3-distutils
-* [PMDK](https://github.com/pmem/pmdk) - native persistent memory libraries
-* [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
+* [PMDK](https://github.com/pmem/pmdk) at least in version 1.7 - native persistent memory libraries
+* [pmemkv](https://github.com/pmem/pmemkv) at least in version 1.0 - native key/value library
 
 ## Installation
 
-Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md) on your system.
+Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md)
+on your system.
 
 ```sh
 git clone https://github.com/pmem/pmemkv-python
 cd pmemkv-python
 ```
-If pmemkv is installed in defualt directory (e.g. /usr):
+If pmemkv is installed in default directory (e.g. /usr):
 ```sh
 sudo python3 setup.py install
 ```
@@ -48,7 +48,7 @@ python3 -m pytest -v pmemkv_tests.py
 ## Example
 
 We are using `/dev/shm` to
-[emulate persistent memory](http://pmem.io/2016/02/22/pm-emulation.html)
+[emulate persistent memory](https://pmem.io/2016/02/22/pm-emulation.html)
 in example.
 
 It can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-python/tree/master/examples).
