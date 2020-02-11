@@ -39,6 +39,12 @@
 #include <iostream>
 #include <unordered_map>
 
+#define PY_MEMORY_EXCEPTION                                                              \
+	do {                                                                             \
+		PyErr_SetString(PyExc_MemoryError,                                       \
+				"Cannot allocate memory for internal objects");          \
+	} while (0)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -275,24 +281,24 @@ void value_callback(const char *value, size_t valuebyte, void *context)
 {
 	PmemkvValueBufferObject *entry =
 		PyObject_New(PmemkvValueBufferObject, &PmemkvValueBufferType);
-	if (entry) {
-		entry->value = value;
-		entry->length = valuebyte;
-		PyObject *args = PyTuple_New(1);
-		if (args != NULL) {
-			if (PyTuple_SetItem(args, 0, (PyObject *)entry) == 0) {
-				PyObject *res =
-					PyObject_CallObject((PyObject *)context, args);
-				Py_XDECREF(res);
-			}
-		}
-		entry->value = NULL;
-		entry->length = 0;
-		Py_XDECREF(args);
-	} else {
-		PyErr_SetString(PyExc_MemoryError,
-				"Cannot create memory buffer");
+	if (entry == NULL) {
+		PY_MEMORY_EXCEPTION;
+		return;
 	}
+	entry->value = value;
+	entry->length = valuebyte;
+	PyObject *args = PyTuple_New(1);
+	if (args == NULL) {
+		Py_DECREF(entry);
+		PY_MEMORY_EXCEPTION;
+		return;
+	}
+	// PyTuple_SetItem sets exception on failure on it's own
+	if (PyTuple_SetItem(args, 0, (PyObject *)entry) == 0) {
+		PyObject *res = PyObject_CallObject((PyObject *)context, args);
+		Py_XDECREF(res);
+	}
+	Py_XDECREF(args); // args is owner of entry reference counter
 }
 
 int key_callback(const char *key, size_t keybytes, const char *value, size_t valuebyte,
@@ -311,36 +317,38 @@ int key_value_callback(const char *key, size_t keybytes, const char *value,
 		PyObject_New(PmemkvValueBufferObject, &PmemkvValueBufferType);
 	PmemkvValueBufferObject *key_buffer =
 		PyObject_New(PmemkvValueBufferObject, &PmemkvValueBufferType);
-	Py_INCREF(value_buffer);
-	Py_INCREF(key_buffer);
-	int retval = 0;
-	if (value_buffer) {
-		value_buffer->value = value;
-		value_buffer->length = valuebyte;
+	if ((value_buffer == NULL) || (key_buffer == NULL)) {
+		Py_XDECREF(value_buffer);
+		Py_XDECREF(key_buffer);
+		PY_MEMORY_EXCEPTION;
+		return -1;
 	}
-	if (key_buffer) {
-		key_buffer->value = key;
-		key_buffer->length = keybytes;
-	}
-	PyObject *args = PyTuple_New(2);
-	if (PyTuple_SetItem(args, 0, (PyObject *)key_buffer) != 0) {
-		retval = -1;
-	} else if (PyTuple_SetItem(args, 1, (PyObject *)value_buffer) != 0) {
-		retval = -1;
-	}
-	PyObject *res = PyObject_CallObject((PyObject *)context, args);
-	key_buffer->value=NULL;
-	key_buffer->length=0;
-	value_buffer->value=NULL;
-	value_buffer->length=0;
+	value_buffer->value = value;
+	value_buffer->length = valuebyte;
+	key_buffer->value = key;
+	key_buffer->length = keybytes;
 
-	Py_DECREF(value_buffer);
-	Py_DECREF(key_buffer);
+	PyObject *args = PyTuple_New(2);
+	if (args == NULL) {
+		Py_DECREF(value_buffer);
+		Py_DECREF(key_buffer);
+		PY_MEMORY_EXCEPTION;
+		return -1;
+	}
+	if ((PyTuple_SetItem(args, 0, (PyObject *)key_buffer) == 0) &&
+	    (PyTuple_SetItem(args, 1, (PyObject *)value_buffer) == 0)) {
+		PyObject *res = PyObject_CallObject((PyObject *)context, args);
+		Py_XDECREF(res);
+	}
+	key_buffer->value = NULL;
+	key_buffer->length = 0;
+	value_buffer->value = NULL;
+	value_buffer->length = 0;
+
 	Py_DECREF(args);
-	Py_XDECREF(res);
 	if (PyErr_Occurred() != NULL)
-		retval = -1;
-	return retval;
+		return -1;
+	return 0;
 }
 
 // "All" Methods.
