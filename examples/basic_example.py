@@ -68,6 +68,14 @@ db.get(
     ),
 )
 
+print("Get first 2 bytes of the value (without copying the entire value) and the key in a lambda expression")
+db.get(
+    key,
+    lambda v, k=key: print(
+        f"key: {k} with first 2 bytes of the value: " f"{(memoryview(v)[0:2]).tobytes().decode()}"
+    ),
+)
+
 print("Removing existing key")
 db.remove("key1")
 assert not db.exists("key1")

@@ -508,8 +508,8 @@ class TestKVEngine(unittest.TestCase):
         db[key] = val
         with self.assertRaises(IndexError):
             db.get(key, lambda v: memoryview(v).tobytes()[4])
-        with self.assertRaises(TypeError):
-            db.get(key, lambda v: memoryview(v)[1])
+        with self.assertRaises(IndexError):
+            db.get(key, lambda v: memoryview(v)[4])
         db.stop()
 
     def test_get_lambda_in_callback(self):
@@ -521,6 +521,17 @@ class TestKVEngine(unittest.TestCase):
         db.get(key, lambda v, k=key: self.assertEqual(memoryview(v).tobytes(),
                                              "123".encode('utf-8')))
         db.get(key, lambda v, k=key: self.assertEqual(k, "dict_test"))
+        db.stop()
+
+    def test_get_with_value_indexing(self):
+        key = "dict_test"
+        val = "123"
+        db = Database(self.engine, self.config)
+        db[key] = val
+
+        db.get(key, lambda v, k=key: self.assertEqual((memoryview(v)[0:2])
+                                             .tobytes(),
+                                             "12".encode('utf-8')))
         db.stop()
 
     def test_dict_len(self):
