@@ -1,4 +1,4 @@
-#  Copyright 2019, Intel Corporation
+#  Copyright 2019-2020, Intel Corporation
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -28,10 +28,11 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Python bindings for pmemkv
+"""
+Python bindings for pmemkv
 
 pmemkv is a local/embedded key-value datastore optimized for persistent memory.
-For more information, see http://pmem.io/pmemkv.
+For more information, see https://pmem.io/pmemkv.
 """
 
 from pmemkv.pmemkv import Database

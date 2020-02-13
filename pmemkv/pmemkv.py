@@ -79,14 +79,14 @@ class Database():
         self.stop()
 
     def stop(self):
-        """ Stops the running engine."""
+        """ Stops the running engine. """
         self.db.stop()
 
     def put(self, key, value):
         """
-        Inserts the key/value pair into pmemkv datastore. This method accepts
-        Unicode objects as well as bytes-like objects. Unicode objects are
-        stored using 'utf-8' encoding.
+        Inserts the key/value pair into the pmemkv datastore. This method
+        accepts Unicode objects as well as bytes-like objects.
+        Unicode objects are stored using 'utf-8' encoding.
 
         Parameters
         ----------
@@ -113,7 +113,7 @@ class Database():
 
     def get_keys_above(self, key, func):
         """
-        Executes callback function for every key stored in
+        Executes callback function for every key stored in the
         pmemkv datastore, whose keys are greater than the given key.
 
         Parameters
@@ -131,7 +131,7 @@ class Database():
 
     def get_keys_below(self, key, func):
         """
-        Executes callback function for every key stored in
+        Executes callback function for every key stored in the
         pmemkv datastore, whose keys are lower than the given key.
 
         Parameters
@@ -182,7 +182,7 @@ class Database():
     def count_above(self, key):
         """
         Returns number of currently stored key/value pairs in the pmemkv datastore,
-        whose keys are greater than the given key
+        whose keys are greater than the given key.
 
         Parameters
         ----------
@@ -220,7 +220,7 @@ class Database():
     def count_between(self, key1, key2):
         """
         Returns number of currently stored key/value pairs in the pmemkv datastore,
-        whose keys are greater than the key1 and less than the key2
+        whose keys are greater than the key1 and less than the key2.
 
         Parameters
         ----------
@@ -255,7 +255,7 @@ class Database():
     def get_above(self, key, func):
         """
         Executes callback function for every key/value pair stored in
-        pmemkv datastore, whose keys are greater than the given key.
+        the pmemkv datastore, whose keys are greater than the given key.
 
         Parameters
         ----------
@@ -274,7 +274,7 @@ class Database():
     def get_below(self, key, func):
         """
         Executes callback function for every key/value pair stored in
-        pmemkv datastore, whose keys are lower than the given key.
+        the pmemkv datastore, whose keys are lower than the given key.
 
         Parameters
         ----------
@@ -292,7 +292,7 @@ class Database():
     def get_between(self, key1, key2, func):
         """
         Executes callback function for every key/value pair stored in
-        pmemkv datastore, whose keys are greater than the key1 and less
+        the pmemkv datastore, whose keys are greater than the key1 and less
         than the key2.
 
         Parameters
@@ -345,10 +345,10 @@ class Database():
 
     def get_string(self, key):
         """
-        Gets copy (as a string) of value for given key
+        Gets copy (as a string) of value for given key.
 
         Value returned by get_string() is still accessible after removal
-        of element from datastore
+        of element from datastore.
 
         Parameters
         ----------
@@ -364,7 +364,7 @@ class Database():
 
     def remove(self, key):
         """
-        Removes key/value pair from pmemkv datastore for given key.
+        Removes key/value pair from the pmemkv datastore for given key.
 
         Parameters
         ----------

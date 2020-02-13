@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Intel Corporation
+ * Copyright 2019-2020, Intel Corporation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -709,10 +709,10 @@ static PyTypeObject PmemkvType = {
 	.tp_finalize = 0,
 };
 
-// Module defination.
+// Module definition.
 static struct PyModuleDef pmemkv_NI_module = {
 	PyModuleDef_HEAD_INIT,
-	"_pmemkv", /* name of module */
+	"_pmemkv", /* name of the module */
 	NULL, /* module documentation, may be NULL */
 	-1, /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
 };
