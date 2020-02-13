@@ -10,9 +10,9 @@ in pmemkv's man pages.
 ## Dependencies
 
 * Python 3.6 or later
-	* along with python3-distutils
-* [PMDK](https://github.com/pmem/pmdk) at least in version 1.7 - native persistent memory libraries
-* [pmemkv](https://github.com/pmem/pmemkv) at least in version 1.0 - native key/value library
+	* along with python3-setuptools
+* python3-dev(el) - header files and a static library for Python
+* libpmemkv-dev(el) - at least in version 1.0 - native key/value library
 
 ## Installation
 
