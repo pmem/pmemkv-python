@@ -357,7 +357,7 @@ pmemkv_NI_GetKeys(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -375,7 +375,7 @@ pmemkv_NI_GetKeysAbove(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -393,7 +393,7 @@ pmemkv_NI_GetKeysBelow(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -412,7 +412,7 @@ pmemkv_NI_GetKeysBetween(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 // "Count" Methods.
@@ -486,7 +486,7 @@ pmemkv_NI_GetAll(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -504,7 +504,7 @@ pmemkv_NI_GetAbove(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -522,7 +522,7 @@ pmemkv_NI_GetBelow(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -541,7 +541,7 @@ pmemkv_NI_GetBetween(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 // "Exists" Method.
@@ -571,7 +571,7 @@ pmemkv_NI_Put(PmemkvObject *self, PyObject* args) {
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *pmemkv_NI_GetString(PmemkvObject *self, PyObject *args)
@@ -618,7 +618,7 @@ static PyObject *pmemkv_NI_Get(PmemkvObject *self, PyObject *args)
 		PyErr_SetString(ExceptionDispatcher[result].exception, pmemkv_errormsg());
 		return NULL;
 	}
-	return PyLong_FromLong(result);
+	Py_RETURN_NONE;
 }
 
 static PyObject *
