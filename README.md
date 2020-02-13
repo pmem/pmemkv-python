@@ -9,9 +9,9 @@ are logged as GitHub issues.*
 ## Dependencies
 
 * Python 3.6 or later
-	* along with python3-distutils
-* [PMDK](https://github.com/pmem/pmdk) - native persistent memory libraries
-* [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
+	* along with python3-setuptools
+* python3-dev(el) - header files and a static library for Python
+* libpmemkv-dev(el) - native key/value library
 
 ## Installation
 
