@@ -141,6 +141,8 @@ static int PmemkvValueBuffer_init(PmemkvValueBufferObject *self)
 	if (self != NULL) {
 		self->value = NULL;
 		self->length = 0;
+	} else {
+		return -1;
 	}
 	return 0;
 }
@@ -150,6 +152,9 @@ static void PmemkvValueBuffer_dealloc(PmemkvValueBufferObject *self)
 	PyObject_Del(self);
 }
 
+/*
+ * Configuration of PmemkvValueBuffer object.
+ */
 static PyTypeObject PmemkvValueBufferType = {
 	PyVarObject_HEAD_INIT(&PyType_Type, 0)
 	.tp_name = "pmemkv.pmemkv_NI",
@@ -171,7 +176,7 @@ static PyTypeObject PmemkvValueBufferType = {
 	.tp_setattro = 0,
 	.tp_as_buffer = &PmemkvValueBuffer_as_buffer,
 	.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-	.tp_doc = "Pmemkv value type", /* tp_doc */
+	.tp_doc = "Pmemkv value type",
 	.tp_traverse = 0,
 	.tp_clear = 0,
 	.tp_richcompare = 0,
@@ -190,7 +195,7 @@ static PyTypeObject PmemkvValueBufferType = {
 	.tp_alloc = 0,
 	.tp_new = PmemkvValueBuffer_new,
 	.tp_free = 0,
-	.tp_is_gc = 0, /* For PyObject_IS_GC */
+	.tp_is_gc = 0,
 	.tp_bases = 0,
 	.tp_mro = 0,
 	.tp_cache = 0,
@@ -216,14 +221,6 @@ static PyObject *
 Pmemkv_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 	PmemkvObject *self = (PmemkvObject *) type->tp_alloc(type, 0);
 	return (PyObject *) self;
-}
-
-static int Pmemkv_init(PmemkvObject *self)
-{
-	if (self != NULL) {
-		self->db = NULL;
-	}
-	return 0;
 }
 
 // Turn on/off operations.
@@ -664,6 +661,9 @@ static PyMethodDef pmemkv_NI_methods[] = {
 	{"remove", (PyCFunction)pmemkv_NI_Remove, METH_VARARGS, NULL},
 	{NULL, NULL, 0, NULL}};
 
+/*
+ * Configuration of pmemkv_NI object.
+ */
 static PyTypeObject PmemkvType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name = "pmemkv.pmemkv_NI",
@@ -685,7 +685,7 @@ static PyTypeObject PmemkvType = {
 	.tp_setattro = 0,
 	.tp_as_buffer = 0,
 	.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-	.tp_doc = "Pmemkv binding", /* tp_doc */
+	.tp_doc = "Pmemkv binding",
 	.tp_traverse = 0,
 	.tp_clear = 0,
 	.tp_richcompare = 0,
@@ -700,11 +700,11 @@ static PyTypeObject PmemkvType = {
 	.tp_descr_get = 0,
 	.tp_descr_set = 0,
 	.tp_dictoffset = 0,
-	.tp_init = (initproc)Pmemkv_init,
+	.tp_init = 0,
 	.tp_alloc = 0,
 	.tp_new = Pmemkv_new,
 	.tp_free = 0,
-	.tp_is_gc = 0, /* For PyObject_IS_GC */
+	.tp_is_gc = 0,
 	.tp_bases = 0,
 	.tp_mro = 0,
 	.tp_cache = 0,
