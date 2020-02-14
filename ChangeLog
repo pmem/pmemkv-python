@@ -1,7 +1,8 @@
-Fri Feb 14 2020 Paweł Karczewski <pawel.karczewski@intel.com>
-	* Version 1.0
+Mon Feb 17 2020 Łukasz Stolarczuk <lukasz.stolarczuk@intel.com>
 
-	This is the first release of pmemkv python bindings which guarantees
+	* Version 1.0-rc1
+
+	This is the first release of pmemkv Python bindings which guarantees
 	backward compatibility and supports all of the pmemkv 1.0 features.
 
 	API changes:
@@ -9,11 +10,11 @@ Fri Feb 14 2020 Paweł Karczewski <pawel.karczewski@intel.com>
 	- Introduced dictionary interface for indirect access to data.
 	- Introduced context manager interface.
 	- Switched from return value based error handling to exception based.
-	- Switched from text representation of engine json configuration to
+	- Switched from text representation of engine's JSON configuration to
 		dictionary.
 
 	Other changes:
-	- Added example for exposing pmemkv as rest-api service.
+	- Added example for exposing pmemkv as REST API service.
 	- Switched from distutils to setuptools.
 	- Added docstring documentation.
 
