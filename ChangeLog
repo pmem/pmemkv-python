@@ -1,3 +1,22 @@
+Fri Feb 14 2020 Paweł Karczewski <pawel.karczewski@intel.com>
+	* Version 1.0
+
+	This is the first release of pmemkv python binding which guarantees
+	backward compatibility.
+
+	API changes:
+	- Introduced interface for direct memory access via Buffer Protocol.
+	- Introduced dictionary interface for indirect access to data.
+	- Introduced context manager interface.
+	- Switched from return value based error handling to exception based.
+	- Switched from text representation of engine configuration json to
+		dictionary.
+
+	Other changes:
+	- Added example for exposing pmemkv as rest-api service
+	- Switched from distutils to setuptools.
+	- Added docstring documentation
+
 Fri Oct 04 2019 Szymon Romik <szymon.romik@intel.com>
 
 	* Version 0.9
