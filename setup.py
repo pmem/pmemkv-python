@@ -46,7 +46,7 @@ setuptools.setup(
     description="Python bindings for PMEMKV library",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://github.com/pmem/pmemkv-python",
+    url="https://pmem.io/pmemkv-python",
     author="Pmemkv development team",
     packages=setuptools.find_packages(),
     classifiers=[
