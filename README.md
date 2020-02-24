@@ -59,3 +59,12 @@ To execute examples:
 PMEM_IS_PMEM_FORCE=1 python3 basic_example.py
 PMEM_IS_PMEM_FORCE=1 python3 restAPI/run_example.py
 ```
+
+## Documentation
+
+After installation, docs can be generated using sphinx (to install, run:
+`pip3 install sphinx`) by executing commands:
+```sh
+cd doc
+make html
+```
