@@ -28,12 +28,19 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Python bindings for pmemkv """
+""" Python bindings for pmemkv. """
 
 import _pmemkv
 import json
 
 class Database():
+    """
+    Main Python pmemkv class, it provides functions to operate on data in database.
+
+    This class can be used dict-like, i.a. accessing and assigning data using '[]'.
+    If an error/exception is thrown from any method it will contain pmemkv status
+    and error message.
+    """
 
     def __init__(self, engine, config):
         """
