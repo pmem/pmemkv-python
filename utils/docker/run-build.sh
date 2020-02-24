@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2019, Intel Corporation
+# Copyright 2019-2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -70,3 +70,10 @@ PMEM_IS_PMEM_FORCE=1 python3 basic_example.py
 
 REST_API_EXAMPLE_DIR="${WORKDIR}/examples/restAPI"
 python3 ${REST_API_EXAMPLE_DIR}/run_example.py
+
+echo
+echo "########################################################"
+echo "### Generating doc"
+echo "########################################################"
+cd $WORKDIR/doc
+make html
