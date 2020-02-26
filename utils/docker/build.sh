@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2017-2019, Intel Corporation
+# Copyright 2017-2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -44,6 +44,7 @@
 #
 
 set -e
+source $(dirname $0)/valid-branches.sh
 
 if [[ -z "$OS" || -z "$OS_VER" ]]; then
 	echo "ERROR: The variables OS and OS_VER have to be set " \
@@ -84,6 +85,11 @@ if [ "$COVERAGE" == "1" ]; then
 fi
 
 if [ -n "$DNS_SERVER" ]; then DNS_SETTING=" --dns=$DNS_SERVER "; fi
+
+# Only run doc update on $GITHUB_REPO master or stable branch
+if [[ -z "${TRAVIS_BRANCH}" || -z "${TARGET_BRANCHES[${TRAVIS_BRANCH}]}" || "$TRAVIS_PULL_REQUEST" != "false" || "$TRAVIS_REPO_SLUG" != "${GITHUB_REPO}" ]]; then
+	AUTO_DOC_UPDATE=0
+fi
 
 WORKDIR=/pmemkv-python
 SCRIPTSDIR=$WORKDIR/utils/docker
