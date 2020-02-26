@@ -71,9 +71,12 @@ PMEM_IS_PMEM_FORCE=1 python3 basic_example.py
 REST_API_EXAMPLE_DIR="${WORKDIR}/examples/restAPI"
 python3 ${REST_API_EXAMPLE_DIR}/run_example.py
 
-echo
-echo "########################################################"
-echo "### Generating doc"
-echo "########################################################"
-cd $WORKDIR/doc
-make html
+# Create PR with generated docs
+if [[ "$AUTO_DOC_UPDATE" == "1" ]]; then
+	echo
+	echo "########################################################"
+	echo "###Running auto doc update"
+	echo "########################################################"
+
+	$SCRIPTSDIR/run-doc-update.sh
+fi
