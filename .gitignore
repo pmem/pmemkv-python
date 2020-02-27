@@ -3,6 +3,7 @@
 !.gitattributes
 !.travis.yml
 __pycache__/
+/doc/_build/
 
 # Distribution / packaging
 build/

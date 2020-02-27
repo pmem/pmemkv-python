@@ -28,12 +28,31 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Python bindings for pmemkv """
+""" Python bindings for pmemkv. """
 
 import _pmemkv
 import json
 
 class Database():
+    """
+    Main Python pmemkv class, it provides functions to operate on data in database.
+
+    This class can be used dict-like, i.a. accessing and assigning data using '[]'.
+    If an error/exception is thrown from any method it will contain pmemkv's status
+    and error message. Currently returned statuses are described in libpmemkv manpage:
+    https://pmem.io/pmemkv/master/manpages/libpmemkv.3.html#errors
+
+    Possible exceptions to be thrown in Python binding are as follows:
+    - Error,
+    - UnknownError,
+    - NotSupported,
+    - InvalidArgument,
+    - ConfigParsingError,
+    - ConfigTypeError,
+    - StoppedByCallback,
+    - WrongEngineName,
+    - TransactionScopeError.
+    """
 
     def __init__(self, engine, config):
         """

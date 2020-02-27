@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-#
-# Copyright 2019-2020, Intel Corporation
+# Copyright 2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,50 +28,23 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#
-# run-build.sh <pmemkv_version> - checks binding's building and installation
-#                                 with pmemkv installed in given version
+# Minimal makefile for Sphinx documentation
 #
 
-set -e
+# You can set these variables from the command line, and also
+# from the environment for the first two.
+SPHINXOPTS    ?=
+SPHINXBUILD   ?= sphinx-build
+SOURCEDIR     = .
+BUILDDIR      = _build
 
-# build and install pmemkv
-pmemkv_version=$1
-cd /opt/pmemkv-$pmemkv_version/
+# Put it first so that "make" without argument is like "make help".
+help:
+	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-if [ "${PACKAGE_MANAGER}" = "deb" ]; then
-	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
-elif [ "${PACKAGE_MANAGER}" = "rpm" ]; then
-	echo $USERPASS | sudo -S rpm -i libpmemkv*.rpm
-else
-	echo "PACKAGE_MANAGER env variable not set or set improperly ('deb' or 'rpm' supported)."
-	exit 1
-fi
+.PHONY: help Makefile
 
-echo
-echo "##########################################################"
-echo "### Verifying building, installation and tests execution  "
-echo "##########################################################"
-cd $WORKDIR
-python3 setup.py bdist_wheel
-pip3 install dist/pmemkv-*.whl --user
-cd $WORKDIR/tests
-python3 -X faulthandler -m pytest -v pmemkv_tests.py
-python3 -X faulthandler -m pytest -v  nontrivial_data_tests.py
-
-echo
-echo "##########################################################"
-echo "### Checking examples"
-echo "##########################################################"
-cd $WORKDIR/examples
-PMEM_IS_PMEM_FORCE=1 python3 basic_example.py
-
-REST_API_EXAMPLE_DIR="${WORKDIR}/examples/restAPI"
-python3 ${REST_API_EXAMPLE_DIR}/run_example.py
-
-echo
-echo "########################################################"
-echo "### Generating doc"
-echo "########################################################"
-cd $WORKDIR/doc
-make html
+# Catch-all target: route all unknown targets to Sphinx using the new
+# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
+%: Makefile
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
