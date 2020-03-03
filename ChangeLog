@@ -1,6 +1,6 @@
-Mon Feb 17 2020 Łukasz Stolarczuk <lukasz.stolarczuk@intel.com>
+Tue Mar 03 2020 Szymon Romik <szymon.romik@intel.com>
 
-	* Version 1.0-rc1
+	* Version 1.0
 
 	This is the first release of pmemkv Python bindings which guarantees
 	backward compatibility and supports all of the pmemkv 1.0 features.
