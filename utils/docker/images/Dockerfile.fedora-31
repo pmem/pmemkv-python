@@ -74,6 +74,7 @@ RUN dnf update -y \
 	wget \
 	which \
 	python3-pip \
+	libatomic \
 && dnf clean all
 
 RUN pip3 install pytest setuptools wheel

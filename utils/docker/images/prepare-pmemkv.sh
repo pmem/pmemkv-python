@@ -39,8 +39,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Merge pull request #602 from ldorau/Fix-setting-compilers--do-not-mix-gcc-with-clang
-current_pmemkv_version="5aff9f197e2e3eaae7f419c04ab9e2fc98309eed"
+# master: Merge pull request #985 from JanDorniak99/add_test_case_with_zero_filled_string
+current_pmemkv_version="e57429f4640278b7eead80f89832ba1136356c81"
 # stable-1.0: Merge pull request #528 from ldorau/Do-not-add-pmemkv_config...; 14.11.2019
 stable_1_pmemkv_version="a3735b5393f0d5411ef8a2468b36d2a1ed00c0a1"
 # stable-1.1: Version 1.1

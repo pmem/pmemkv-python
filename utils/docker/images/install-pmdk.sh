@@ -39,8 +39,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# stable-1.8: common: fix build on GitHub Actions
-PMDK_VERSION="eeb8fd86c6c72f4607a22a1e9d9f7da31be8af2a"
+# stable-1.10
+PMDK_VERSION="1.10"
 
 git clone https://github.com/pmem/pmdk --shallow-since=2019-09-26
 cd pmdk
