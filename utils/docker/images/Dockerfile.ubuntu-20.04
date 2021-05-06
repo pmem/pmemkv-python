@@ -30,75 +30,74 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# Dockerfile - a 'recipe' for Docker to build an image of fedora-based
+# Dockerfile - a 'recipe' for Docker to build an image of ubuntu-based
 #              environment prepared for running pmemkv-python build and tests.
 #
 
 # Pull base image
-FROM fedora:31
+FROM ubuntu:20.04
 MAINTAINER szymon.romik@intel.com
 
 # Set required environment variables
-ENV OS fedora
-ENV OS_VER 31
-ENV PACKAGE_MANAGER rpm
+ENV OS ubuntu
+ENV OS_VER 20.04
+ENV PACKAGE_MANAGER deb
 ENV NOTTY 1
 
-# Install basic tools
-RUN dnf update -y \
- && dnf install -y \
+# Update the Apt cache and install basic tools
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 	autoconf \
 	automake \
+	build-essential \
 	clang \
 	cmake \
-	daxctl-devel \
-	gcc \
-	gcc-c++ \
-	gdb \
+	curl \
+	debhelper \
+	devscripts \
+	fakeroot \
 	git \
-	hub \
+	libc6-dbg \
+	libdaxctl-dev \
+	libmemkind-dev \
+	libndctl-dev \
+	libnode-dev \
+	libnuma-dev \
+	libtbb-dev \
+	libtext-diff-perl \
 	libtool \
-	make \
-	man \
-	memkind-devel \
-	ndctl-devel \
-	numactl-devel \
+	libunwind8-dev \
+	numactl \
 	pandoc \
-	python3-devel \
+	pkg-config \
+	python3-dev \
+	python3-distutils \
 	python3-sphinx \
-	rapidjson-devel \
-	rpm-build \
+	rapidjson-dev \
 	sudo \
-	tbb-devel \
-	unzip \
 	wget \
-	which \
+	whois \
 	python3-pip \
-&& dnf clean all
+ && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install pytest setuptools wheel
 #Install examples dependencies
 RUN pip3 install falcon pexpect requests
 
-# Install glibc-debuginfo
-RUN dnf debuginfo-install -y glibc
-
 # Install pmdk
 COPY install-pmdk.sh install-pmdk.sh
-RUN ./install-pmdk.sh rpm
+RUN ./install-pmdk.sh dpkg
 
 # Install pmdk c++ bindings
 COPY install-libpmemobj-cpp.sh install-libpmemobj-cpp.sh
-RUN ./install-libpmemobj-cpp.sh RPM
+RUN ./install-libpmemobj-cpp.sh DEB
 
 # Prepare pmemkv
 COPY prepare-pmemkv.sh prepare-pmemkv.sh
-RUN ./prepare-pmemkv.sh RPM
+RUN ./prepare-pmemkv.sh DEB
 
 # Add user
 ENV USER user
 ENV USERPASS pass
-RUN useradd -m $USER
-RUN echo "$USER:$USERPASS" | chpasswd
-RUN gpasswd wheel -a $USER
+RUN useradd -m $USER -g sudo -p `mkpasswd $USERPASS`
 USER $USER

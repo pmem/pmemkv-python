@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2019, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -40,8 +40,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Merge pull request #652 from ldorau/Create-separate-Docker-images-for-v1.10-branch
-LIBPMEMOBJ_CPP_VERSION="006137044243981f4760ae220101a43cf97bcf2d"
+# master: Merge pull request #1062 from igchor/fix_parallel_xexec
+LIBPMEMOBJ_CPP_VERSION='485353b9c2fdbaf57607dcd83551664cbc3cd963'
 
 git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2019-10-02
 cd libpmemobj-cpp
@@ -50,7 +50,7 @@ git checkout $LIBPMEMOBJ_CPP_VERSION
 mkdir build
 cd build
 
-cmake .. -DCPACK_GENERATOR="$PACKAGE_TYPE" -DCMAKE_INSTALL_PREFIX=$PREFIX
+cmake .. -DCPACK_GENERATOR="$PACKAGE_TYPE" -DCMAKE_INSTALL_PREFIX=$PREFIX -DTESTS_USE_VALGRIND=0
 
 if [ "$PACKAGE_TYPE" = "" ]; then
 	make -j$(nproc) install

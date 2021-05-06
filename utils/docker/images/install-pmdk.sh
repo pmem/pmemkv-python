@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2019, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -39,8 +39,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# stable-1.8: common: fix build on GitHub Actions
-PMDK_VERSION="eeb8fd86c6c72f4607a22a1e9d9f7da31be8af2a"
+# 1.10
+PMDK_VERSION="b661e50ac7b2a6c6b153f1a52309a0e4149eb2a2"
 
 git clone https://github.com/pmem/pmdk --shallow-since=2019-09-26
 cd pmdk
